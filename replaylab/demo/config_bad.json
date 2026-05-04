@@ -1,0 +1,11 @@
+{
+  "experiment_name": "oversized_batch_failure",
+  "task": "simulated_gpu_inference",
+  "model_name": "replaylab-qwen-demo",
+  "batch_size": 64,
+  "model_size_mb": 2048,
+  "available_memory_mb": 8192,
+  "items": 512,
+  "expected_failure": "memory_pressure",
+  "recommended_batch_size": 8
+}

@@ -1,0 +1,13 @@
+{
+  "cause": "batch_size_too_large_memory_pressure",
+  "deterministic_checksum": 404968,
+  "expected_failure": "memory_pressure",
+  "experiment_name": "oversized_batch_failure",
+  "model_name": "replaylab-qwen-demo",
+  "recommendation": "Reduce batch_size from 64 to 8 and rerun.",
+  "recommended_batch_size": 8,
+  "replay_hint_command": "python replaylab/demo/demo_experiment.py --config replaylab/demo/config_good.json --output replaylab/runs/manual_good",
+  "status": "failed",
+  "summary": "Run failed because estimated memory demand exceeded available memory.",
+  "task": "simulated_gpu_inference"
+}

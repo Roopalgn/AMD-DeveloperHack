@@ -1,0 +1,22 @@
+{
+  "command": "python replaylab/demo/demo_experiment.py --config replaylab/demo/config_good.json --output replaylab/runs/tmp_good",
+  "copied_outputs": [
+    "metrics.json",
+    "artifact.json"
+  ],
+  "duration_sec": 0.218187,
+  "end_time": "2026-05-04T13:44:35.750193+00:00",
+  "exit_code": 0,
+  "resolved_command": [
+    "C:\\Users\\roopa\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "replaylab/demo/demo_experiment.py",
+    "--config",
+    "replaylab/demo/config_good.json",
+    "--output",
+    "replaylab/runs/tmp_good"
+  ],
+  "run_dir": "replaylab\\runs\\good_run",
+  "run_id": "good_run",
+  "source_output_dir": "replaylab\\runs\\tmp_good",
+  "start_time": "2026-05-04T13:44:35.531212+00:00"
+}
