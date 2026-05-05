@@ -1,0 +1,13 @@
+{
+  "cause": "timeout_exceeded",
+  "deterministic_checksum": 785360,
+  "expected_failure": "timeout",
+  "experiment_name": "timeout_overload",
+  "model_name": "replaylab-qwen-demo",
+  "recommendation": "Reduce items from 100000 to 512 or increase max_duration_sec.",
+  "recommended_batch_size": 8,
+  "replay_hint_command": "python replaylab/demo/demo_experiment.py --config replaylab/demo/config_good.json --output replaylab/runs/manual_good",
+  "status": "failed",
+  "summary": "Run exceeded max_duration_sec=2.0s processing 100000 items.",
+  "task": "simulated_gpu_inference"
+}

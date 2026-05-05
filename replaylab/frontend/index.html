@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReplayLab — GPU Experiment Flight Recorder</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0d1117; color: #c9d1d9; min-height: 100vh; }
+.header { padding: 2rem 2rem 1rem; border-bottom: 1px solid #21262d; }
+.header h1 { color: #58a6ff; font-size: 1.6rem; }
+.header p { color: #8b949e; margin-top: 0.3rem; }
+.main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+.scenarios { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+.scenario-card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 1.2rem; cursor: pointer; transition: border-color 0.2s; }
+.scenario-card:hover { border-color: #58a6ff; }
+.scenario-card.active { border-color: #58a6ff; box-shadow: 0 0 0 1px #58a6ff; }
+.scenario-card h3 { color: #f0f6fc; font-size: 1rem; margin-bottom: 0.3rem; }
+.scenario-card p { color: #8b949e; font-size: 0.85rem; }
+.run-btn { background: #238636; color: #fff; border: none; padding: 0.8rem 2rem; border-radius: 6px; font-size: 1rem; cursor: pointer; font-weight: 600; margin-bottom: 2rem; }
+.run-btn:hover { background: #2ea043; }
+.run-btn:disabled { background: #21262d; color: #484f58; cursor: not-allowed; }
+.timeline { position: relative; padding-left: 2rem; margin-top: 1rem; }
+.timeline::before { content: ''; position: absolute; left: 0.75rem; top: 0; bottom: 0; width: 2px; background: #30363d; }
+.step { position: relative; margin-bottom: 1.2rem; padding: 1rem 1.2rem; background: #161b22; border: 1px solid #30363d; border-radius: 8px; opacity: 0; transform: translateY(10px); transition: opacity 0.4s, transform 0.4s; }
+.step.visible { opacity: 1; transform: translateY(0); }
+.step::before { content: ''; position: absolute; left: -1.6rem; top: 1.1rem; width: 10px; height: 10px; border-radius: 50%; background: #30363d; }
+.step.fail::before { background: #f85149; }
+.step.diagnose::before { background: #d29922; }
+.step.fix::before { background: #58a6ff; }
+.step.replay::before { background: #a371f7; }
+.step.verify::before { background: #3fb950; }
+.step-label { font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
+.step.fail .step-label { color: #f85149; }
+.step.diagnose .step-label { color: #d29922; }
+.step.fix .step-label { color: #58a6ff; }
+.step.replay .step-label { color: #a371f7; }
+.step.verify .step-label { color: #3fb950; }
+.step-content { color: #c9d1d9; font-size: 0.9rem; }
+.metric-tag { display: inline-block; background: #21262d; padding: 0.2rem 0.5rem; border-radius: 3px; margin: 0.2rem 0.3rem 0.2rem 0; font-family: monospace; font-size: 0.8rem; }
+code { background: #21262d; padding: 0.4rem 0.6rem; border-radius: 4px; display: block; margin-top: 0.4rem; font-size: 0.8rem; overflow-x: auto; white-space: pre-wrap; }
+.gpu-badge { position: fixed; top: 1rem; right: 1rem; background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 0.5rem 0.8rem; font-size: 0.75rem; }
+.gpu-badge .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 0.4rem; }
+.gpu-badge .dot.live { background: #3fb950; }
+.gpu-badge .dot.sim { background: #d29922; }
+.summary { margin-top: 2rem; padding: 1.5rem; background: #161b22; border: 1px solid #3fb950; border-radius: 8px; display: none; }
+.summary.visible { display: block; }
+.summary h3 { color: #3fb950; margin-bottom: 0.5rem; }
+#loading { display: none; color: #8b949e; margin: 1rem 0; }
+#loading.visible { display: block; }
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #30363d; border-top-color: #58a6ff; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 0.5rem; vertical-align: middle; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>ReplayLab</h1>
+  <p>GPU experiment flight recorder — watch a failure become a recovery</p>
+</div>
+
+<div class="gpu-badge" id="gpuBadge">
+  <span class="dot sim"></span>Checking GPU...
+</div>
+
+<div class="main">
+  <h2 style="color:#f0f6fc; margin-bottom:1rem;">Choose a failure scenario</h2>
+  <div class="scenarios" id="scenarios"></div>
+
+  <button class="run-btn" id="runBtn" disabled>Run Recovery Demo</button>
+
+  <div id="loading"><span class="spinner"></span>Running experiment pipeline...</div>
+
+  <div class="timeline" id="timeline"></div>
+
+  <div class="summary" id="summary">
+    <h3>Recovery Complete</h3>
+    <div id="summaryContent"></div>
+  </div>
+</div>
+
+<script>
+let selectedScenario = null;
+
+async function init() {
+  // Load GPU status
+  try {
+    const gpu = await (await fetch('/api/gpu')).json();
+    const badge = document.getElementById('gpuBadge');
+    if (gpu.source === 'simulated') {
+      badge.innerHTML = '<span class="dot sim"></span>GPU: simulated (local dev)';
+    } else {
+      badge.innerHTML = `<span class="dot live"></span>GPU: ${gpu.source} (live)`;
+    }
+  } catch(e) {}
+
+  // Load scenarios
+  try {
+    const scenarios = await (await fetch('/api/scenarios')).json();
+    const container = document.getElementById('scenarios');
+    for (const [key, sc] of Object.entries(scenarios)) {
+      const card = document.createElement('div');
+      card.className = 'scenario-card';
+      card.dataset.scenario = key;
+      card.innerHTML = `<h3>${sc.name}</h3><p>${sc.description}</p>`;
+      card.onclick = () => selectScenario(key, card);
+      container.appendChild(card);
+    }
+  } catch(e) {}
+}
+
+function selectScenario(key, card) {
+  document.querySelectorAll('.scenario-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+  selectedScenario = key;
+  document.getElementById('runBtn').disabled = false;
+}
+
+document.getElementById('runBtn').onclick = async () => {
+  if (!selectedScenario) return;
+  const btn = document.getElementById('runBtn');
+  const timeline = document.getElementById('timeline');
+  const loading = document.getElementById('loading');
+  const summary = document.getElementById('summary');
+
+  btn.disabled = true;
+  timeline.innerHTML = '';
+  summary.classList.remove('visible');
+  loading.classList.add('visible');
+
+  try {
+    const res = await fetch(`/api/run/${selectedScenario}`, { method: 'POST' });
+    const data = await res.json();
+    loading.classList.remove('visible');
+    renderTimeline(data);
+  } catch(e) {
+    loading.classList.remove('visible');
+    timeline.innerHTML = '<p style="color:#f85149">Error running experiment. Check console.</p>';
+    console.error(e);
+  }
+  btn.disabled = false;
+};
+
+function renderTimeline(data) {
+  const timeline = document.getElementById('timeline');
+  const steps = data.timeline;
+  const classes = ['fail', 'diagnose', 'fix', 'replay', 'verify'];
+
+  steps.forEach((step, i) => {
+    const el = document.createElement('div');
+    el.className = `step ${classes[i]}`;
+
+    let content = '';
+    if (step.step === 'FAIL') {
+      content = `<div class="step-label">Failure Detected</div><div class="step-content">${step.detail}</div>`;
+    } else if (step.step === 'DIAGNOSE') {
+      content = `<div class="step-label">Diagnosis</div><div class="step-content"><span class="metric-tag">cause: ${step.cause}</span><span class="metric-tag">confidence: ${step.confidence}</span></div>`;
+    } else if (step.step === 'FIX') {
+      const changes = Object.entries(step.changes || {}).map(([k,v]) => `<span class="metric-tag">${k}: ${JSON.stringify(v.bad)} → ${JSON.stringify(v.good)}</span>`).join('');
+      content = `<div class="step-label">Fix Generated</div><div class="step-content">${changes}<code>${step.command}</code></div>`;
+    } else if (step.step === 'REPLAY') {
+      content = `<div class="step-label">Replay Executed</div><div class="step-content"><span class="metric-tag">exit_code: ${step.exit_code}</span></div>`;
+    } else if (step.step === 'VERIFY') {
+      const color = step.status === 'verified' ? '#3fb950' : '#f85149';
+      content = `<div class="step-label">Verification</div><div class="step-content" style="color:${color}">${step.status === 'verified' ? '✅ Recovery verified successfully' : '❌ Recovery failed'}</div>`;
+    }
+    el.innerHTML = content;
+    timeline.appendChild(el);
+
+    setTimeout(() => el.classList.add('visible'), i * 300);
+  });
+
+  // Summary
+  setTimeout(() => {
+    const summary = document.getElementById('summary');
+    const sc = document.getElementById('summaryContent');
+    const tp = data.replay_result.throughput;
+    const tpStr = tp >= 1000 ? `${(tp/1000).toFixed(0)}k items/sec` : `${tp} items/sec`;
+    sc.innerHTML = `
+      <span class="metric-tag">Scenario: ${data.scenario_name}</span>
+      <span class="metric-tag">Cause: ${data.diagnosis.cause}</span>
+      <span class="metric-tag">Throughput: ${tpStr}</span>
+      <span class="metric-tag">GPU: ${data.gpu_telemetry.source}</span>
+      ${data.llm_diagnosis ? `<span class="metric-tag">LLM: ${data.llm_diagnosis.diagnosis_source}</span>` : ''}
+      <br><br><a href="${data.report_url}" target="_blank" style="color:#58a6ff">View full HTML report →</a>
+    `;
+    summary.classList.add('visible');
+  }, steps.length * 300 + 200);
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "experiment_name": "timeout_fixed",
+  "task": "simulated_gpu_inference",
+  "model_name": "replaylab-qwen-demo",
+  "batch_size": 8,
+  "model_size_mb": 2048,
+  "available_memory_mb": 8192,
+  "items": 512,
+  "max_duration_sec": 10.0,
+  "expected_failure": null,
+  "recommended_batch_size": 8
+}

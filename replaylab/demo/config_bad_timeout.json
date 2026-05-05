@@ -1,0 +1,12 @@
+{
+  "experiment_name": "timeout_overload",
+  "task": "simulated_gpu_inference",
+  "model_name": "replaylab-qwen-demo",
+  "batch_size": 8,
+  "model_size_mb": 2048,
+  "available_memory_mb": 8192,
+  "items": 100000,
+  "max_duration_sec": 2.0,
+  "expected_failure": "timeout",
+  "recommended_batch_size": 8
+}

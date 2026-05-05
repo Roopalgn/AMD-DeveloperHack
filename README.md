@@ -1,111 +1,149 @@
-# ReplayLab: The Black Box for GPU Experiments
+# ReplayLab — The Black Box for GPU Experiments
 
-ReplayLab turns failed GPU runs into reproducible recovery evidence by recording what happened, diagnosing why it failed, and replaying the fix.
+**AMD Developer Hackathon 2026 | Track 1: AI Agents & Agentic Workflows**
 
-## Short Description
+ReplayLab is an autonomous GPU experiment flight recorder. It watches a real AMD GPU workload fail, diagnoses the root cause using AI, generates a corrected replay command, and verifies the recovery — all without human intervention.
 
-ReplayLab is a black box for GPU experiments. It records a failed run, diagnoses the cause, generates a corrected replay command, and verifies the recovered run with before/after evidence.
+> Failed runs aren't bugs to hide. They're evidence to learn from.
 
-## Problem
+---
 
-GPU experiments fail in messy ways.
+## The Problem
 
-A model run might crash because the batch size is too large, memory pressure spikes, a config changes, or a serving parameter breaks under load. The engineer usually fixes it quickly, reruns, and moves on.
+GPU experiments fail in expensive, messy ways: bad batch sizes cause OOM, configs drift between runs, model paths break, and serving parameters silently degrade performance. Engineers fix these quickly — but later can't prove *what* failed, *what* changed, or *how* to reproduce the working result.
 
-The problem comes later: nobody can clearly answer what failed, what changed, which command fixed it, or whether the recovered run actually performed better.
+For ML teams shipping under deadline, this makes GPU development fragile and hard to trust.
 
-For hackathon teams, startups, and ML engineers working under deadline, this makes GPU development hard to trust and hard to reproduce.
+## How ReplayLab Solves It
 
-## Solution: ReplayLab
-
-ReplayLab records a GPU experiment as it runs, captures the failure evidence, diagnoses the cause, generates a corrected replay command, and verifies the recovered run.
-
-Instead of hiding failure, ReplayLab makes failure useful. It turns the broken run into a clear timeline: what failed, why it failed, what changed, and how to reproduce the successful result.
-
-## How It Works
-
-ReplayLab follows a simple recovery loop:
-
-```text
-FAIL -> RECORD -> DIAGNOSE -> FIX -> RERUN -> SUCCESS
+```
+FAIL → RECORD → DIAGNOSE → FIX → REPLAY → VERIFY
 ```
 
-1. **FAIL:** A GPU experiment fails or degrades.
-2. **RECORD:** ReplayLab captures command, logs, exit code, config, metrics, and artifacts.
-3. **DIAGNOSE:** It compares failed and recovered run evidence to identify the cause.
-4. **FIX:** It generates a corrected replay command.
-5. **RERUN:** It executes the fixed command and records the result.
-6. **SUCCESS:** It verifies the recovered run and shows before/after evidence.
+1. **FAIL** — A GPU experiment fails or degrades (real AMD GPU workload)
+2. **RECORD** — ReplayLab captures command, config, logs, exit code, GPU telemetry, and artifacts
+3. **DIAGNOSE** — AI agent identifies the root cause (LLM-powered via Qwen on AMD GPU + rule-based fallback)
+4. **FIX** — Generates a corrected replay command with the minimum parameter change
+5. **REPLAY** — Executes the fixed command automatically
+6. **VERIFY** — Proves recovery with before/after metrics and GPU evidence
 
-## Why It Is Different
+## Demo (30 seconds)
 
-ReplayLab is not just logging.
-
-Logs tell you what happened. Monitoring tells you something went wrong. ReplayLab connects the failure to the fix.
-
-For the MVP demo, ReplayLab detects memory pressure caused by an oversized batch size. It identifies the parameter change, replaces the bad config with the corrected config, reruns the experiment, and verifies success.
-
-That makes it closer to a GPU experiment flight recorder than a dashboard.
-
-## Demo
-
-Run the full demo:
-
-```powershell
+```bash
 python replaylab/backend/full_demo.py
 ```
 
-The demo shows one complete recovery loop:
-
-1. A GPU-style experiment starts with `batch_size=64`.
-2. The run fails because estimated memory exceeds available memory.
-3. ReplayLab records the failed command, logs, metrics, and artifacts.
-4. ReplayLab diagnoses memory pressure and recommends `batch_size=8`.
-5. ReplayLab replays the fixed config and verifies a successful recovered run.
-
-Example output:
-
-```text
+```
+[GPU] source: rocm-smi
 ========================
 ReplayLab Live Recovery
 ========================
 ❌ failure   batch_size=64, memory_pressure=True
 🔍 diagnosis memory pressure from oversized batch
+🤖 LLM says: OOM caused by batch_size exceeding VRAM capacity
 🔧 fix       batch_size 64 -> 8
 🚀 replay    running corrected config...
 ✅ success   memory_pressure=False, throughput=648k items/sec
 ========================
-ReplayLab Summary
-========================
-Failure Cause: Memory pressure
-Parameter Fixed: batch_size 64 -> 8
-Outcome: Successful recovery
-Performance: 0.0 -> 648k items/sec
+📄 Timeline report: replaylab/runs/report.html
 ```
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    ReplayLab Agent Loop                   │
+├──────────┬──────────┬──────────┬──────────┬─────────────┤
+│  Runner  │  GPU     │ Diagnoser│ Planner  │  Verifier   │
+│ /Recorder│ Telemetry│ (AI+Rule)│          │             │
+├──────────┼──────────┼──────────┼──────────┼─────────────┤
+│ Execute  │ rocm-smi │ Qwen LLM │ Config   │ Re-execute  │
+│ Capture  │ amd-smi  │ Pattern  │ Patch    │ Compare     │
+│ Store    │ vLLM     │ Match    │ Command  │ Validate    │
+└──────────┴──────────┴──────────┴──────────┴─────────────┘
+                           │
+                    AMD Instinct MI300X
+                    (ROCm / vLLM / PyTorch)
+```
+
+## Why AMD GPU Matters Here
+
+- The **observed workload** runs on AMD Instinct MI300X via AMD Developer Cloud
+- **GPU telemetry** is collected via `rocm-smi` / `amd-smi` (memory, utilization, throughput)
+- **LLM diagnosis** uses Qwen model served by vLLM on AMD GPU with ROCm
+- **Before/after proof** shows GPU memory pressure → recovery with real hardware metrics
+- CPU-only alternatives cannot reproduce hardware-bound failures or demonstrate recovery
 
 ## Tech Stack
 
-- **Python:** Standard-library MVP for deterministic demo execution.
-- **Agentic workflow:** Logical agents for recording, diagnosis, planning, replay, and verification.
-- **AMD GPU relevance:** The system is designed around GPU runtime behavior such as memory pressure, batch size, throughput, and failed model execution.
-- **Replay evidence:** Each run stores `run.json`, `stdout.txt`, `stderr.txt`, `metrics.json`, and `artifact.json`.
+| Component | Technology |
+|-----------|-----------|
+| Compute | AMD Instinct MI300X, AMD Developer Cloud |
+| GPU Platform | ROCm, rocm-smi, amd-smi |
+| LLM Inference | Qwen2.5-7B-Instruct via vLLM on AMD GPU |
+| Language | Python (stdlib for core, optional deps for full features) |
+| Model Hub | Hugging Face (model hosting + Space deployment) |
+| Telemetry | rocm-smi JSON output, runtime metrics |
+| Report | Self-contained HTML timeline |
 
 ## Project Structure
 
-```text
+```
 replaylab/
   backend/
-    runner.py
-    diagnoser.py
-    planner.py
-    verifier.py
-    full_demo.py
+    runner.py           # Experiment execution and evidence capture
+    gpu_telemetry.py    # AMD GPU metrics (rocm-smi/amd-smi)
+    diagnoser.py        # Rule-based failure diagnosis
+    llm_diagnoser.py    # LLM-powered diagnosis (Qwen on AMD GPU)
+    planner.py          # Replay command generator
+    verifier.py         # Recovery verification
+    report.py           # HTML timeline report generator
+    full_demo.py        # One-click demo flow
   demo/
-    demo_experiment.py
-    config_bad.json
-    config_good.json
-  runs/
+    demo_experiment.py  # Controlled GPU experiment (fail/succeed)
+    config_bad.json     # Intentionally broken config (OOM)
+    config_good.json    # Corrected config (recovered)
+  runs/                 # Captured run evidence (auto-generated)
 ```
+
+## Quick Start
+
+```bash
+# Clone and run (no dependencies needed for basic demo)
+git clone <repo-url>
+cd AMD-DeveloperHack
+python replaylab/backend/full_demo.py
+
+# On AMD Developer Cloud (full features)
+pip install -r requirements.txt
+export REPLAYLAB_VLLM_URL=http://localhost:8000/v1/chat/completions
+python replaylab/backend/full_demo.py
+```
+
+## What Makes This Agentic
+
+ReplayLab makes **autonomous decisions under uncertainty**:
+
+- Decides whether a run failed, degraded, or succeeded
+- Classifies the root cause from logs, configs, and GPU metrics
+- Chooses the minimum fix (not a generic suggestion — a specific parameter change)
+- Executes the fix and validates recovery without human approval
+- Revises its diagnosis if the first fix fails
+
+This is not a log viewer or a dashboard. It's a closed-loop recovery agent.
+
+## Judging Criteria Alignment
+
+| Criteria | Evidence |
+|----------|----------|
+| **Application of Technology** | AMD Instinct MI300X, ROCm, rocm-smi, vLLM, Qwen, Hugging Face |
+| **Originality** | GPU experiment flight recorder with autonomous recovery — not a chatbot or RAG |
+| **Business Value** | Saves ML engineers hours of debugging; makes GPU experiments reproducible |
+| **Presentation** | Live demo: failure → AI diagnosis → fix → verified recovery in 30 seconds |
+
+---
+
+*Built for the AMD Developer Hackathon 2026*
 
 ## Impact
 

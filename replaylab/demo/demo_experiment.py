@@ -94,9 +94,18 @@ def run_experiment(config: dict) -> tuple[int, dict]:
     available_memory_mb = int(config.get("available_memory_mb", 8192))
     items = int(config.get("items", batch_size))
     recommended_batch_size = int(config.get("recommended_batch_size", max(1, batch_size // 8)))
+    model_path = config.get("model_path")
+    max_duration_sec = config.get("max_duration_sec")
 
     runtime = detect_runtime()
     memory = estimate_memory_pressure(batch_size, model_size_mb, available_memory_mb)
+
+    # --- Failure pattern: model path not found ---
+    model_path_error = False
+    if model_path and not Path(model_path).exists():
+        # Check if it looks intentionally bad (absolute path to nonexistent dir)
+        if model_path.startswith("/") or model_path.startswith("C:\\"):
+            model_path_error = True
 
     # Keep the demo deterministic while still doing a tiny amount of work.
     synthetic_work_units = min(items, 2048)
@@ -108,12 +117,42 @@ def run_experiment(config: dict) -> tuple[int, dict]:
     if duration_sec == 0:
         duration_sec = 0.000001
 
-    failed = bool(memory["memory_pressure"])
+    # --- Failure pattern: timeout ---
+    timed_out = False
+    if max_duration_sec and items > 10000:
+        # Simulate that processing 100k items would exceed the timeout
+        estimated_total_time = (duration_sec / synthetic_work_units) * items
+        if estimated_total_time > max_duration_sec or items > 50000:
+            timed_out = True
+            duration_sec = max_duration_sec
+
+    # Determine failure mode
+    memory_failed = bool(memory["memory_pressure"])
+    failed = memory_failed or model_path_error or timed_out
+
+    if model_path_error:
+        failure_cause = "model_not_found"
+        failure_summary = f"Model path '{model_path}' does not exist. Cannot load model."
+        recommendation = f"Fix model_path to a valid location (e.g., './models/qwen2.5-7b')."
+    elif timed_out:
+        failure_cause = "timeout_exceeded"
+        failure_summary = f"Run exceeded max_duration_sec={max_duration_sec}s processing {items} items."
+        recommendation = f"Reduce items from {items} to {recommended_batch_size * 64} or increase max_duration_sec."
+    elif memory_failed:
+        failure_cause = "batch_size_too_large_memory_pressure"
+        failure_summary = "Run failed because estimated memory demand exceeded available memory."
+        recommendation = f"Reduce batch_size from {batch_size} to {recommended_batch_size} and rerun."
+    else:
+        failure_cause = None
+        failure_summary = "Run completed successfully."
+        recommendation = "Keep this config as the replayable recovered run."
+
     status = "failed" if failed else "succeeded"
     throughput = 0.0 if failed else round(items / duration_sec, 3)
 
     metrics = {
         "status": status,
+        "failure_type": failure_cause,
         "duration_sec": duration_sec,
         "started_at": started_at,
         "ended_at": time.time(),
@@ -125,6 +164,10 @@ def run_experiment(config: dict) -> tuple[int, dict]:
         "runtime_overhead_mb": memory["runtime_overhead_mb"],
         "headroom_mb": memory["headroom_mb"],
         "memory_pressure": memory["memory_pressure"],
+        "model_path": model_path,
+        "model_path_valid": not model_path_error,
+        "timed_out": timed_out,
+        "max_duration_sec": max_duration_sec,
         "runtime_kind": runtime["runtime_kind"],
         "gpu_available": runtime["gpu_available"],
         "torch_available": runtime["torch_available"],
@@ -146,17 +189,9 @@ def run_experiment(config: dict) -> tuple[int, dict]:
         "experiment_name": config.get("experiment_name", "replaylab_demo"),
         "task": config.get("task", "simulated_gpu_inference"),
         "model_name": config.get("model_name", "unknown"),
-        "summary": (
-            "Run failed because estimated memory demand exceeded available memory."
-            if failed
-            else "Run completed successfully with a safe batch size."
-        ),
-        "cause": "batch_size_too_large_memory_pressure" if failed else None,
-        "recommendation": (
-            f"Reduce batch_size from {batch_size} to {recommended_batch_size} and rerun."
-            if failed
-            else "Keep this config as the replayable recovered run."
-        ),
+        "summary": failure_summary if failed else "Run completed successfully with a safe batch size.",
+        "cause": failure_cause,
+        "recommendation": recommendation,
         "replay_hint_command": replay_hint,
         "expected_failure": config.get("expected_failure"),
         "recommended_batch_size": recommended_batch_size,

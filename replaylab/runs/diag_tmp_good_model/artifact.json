@@ -1,0 +1,13 @@
+{
+  "cause": null,
+  "deterministic_checksum": 50621,
+  "expected_failure": null,
+  "experiment_name": "correct_model_path",
+  "model_name": "replaylab-qwen-demo",
+  "recommendation": "Keep this config as the replayable recovered run.",
+  "recommended_batch_size": 8,
+  "replay_hint_command": "python replaylab/demo/demo_experiment.py --config replaylab/demo/config_good.json --output replaylab/runs/manual_good",
+  "status": "succeeded",
+  "summary": "Run completed successfully with a safe batch size.",
+  "task": "model_loading"
+}

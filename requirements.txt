@@ -1,0 +1,17 @@
+# ReplayLab - core dependencies
+# The MVP runs on Python stdlib only. These are needed for full features.
+
+# AMD GPU telemetry (optional, graceful fallback if unavailable)
+# rocm-smi is a system tool, not a pip package
+
+# LLM-powered diagnosis (optional, used when AMD Cloud GPU is available)
+huggingface-hub>=0.20.0
+transformers>=4.38.0
+vllm>=0.4.0; platform_system == "Linux"
+
+# API layer
+fastapi>=0.109.0
+uvicorn>=0.27.0
+
+# Timeline report generation
+jinja2>=3.1.0

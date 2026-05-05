@@ -1,0 +1,12 @@
+{
+  "experiment_name": "missing_model_path",
+  "task": "model_loading",
+  "model_name": "replaylab-qwen-demo",
+  "model_path": "/nonexistent/models/qwen2.5-7b",
+  "batch_size": 8,
+  "model_size_mb": 2048,
+  "available_memory_mb": 8192,
+  "items": 512,
+  "expected_failure": "model_not_found",
+  "recommended_batch_size": 8
+}

@@ -4,11 +4,11 @@
     "metrics.json",
     "artifact.json"
   ],
-  "duration_sec": 0.198408,
-  "end_time": "2026-05-04T14:37:32.691895+00:00",
+  "duration_sec": 0.213487,
+  "end_time": "2026-05-04T18:19:29.032461+00:00",
   "exit_code": 0,
   "resolved_command": [
-    "C:\\Users\\roopa\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "C:\\Python313\\python.exe",
     "replaylab/demo/demo_experiment.py",
     "--config",
     "replaylab/demo/config_good.json",
@@ -18,5 +18,5 @@
   "run_dir": "replaylab\\runs\\full_good_baseline",
   "run_id": "full_good_baseline",
   "source_output_dir": "replaylab\\runs\\full_tmp_good",
-  "start_time": "2026-05-04T14:37:32.493944+00:00"
+  "start_time": "2026-05-04T18:19:28.818938+00:00"
 }

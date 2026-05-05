@@ -1,0 +1,6 @@
+ReplayLab demo run: FAILED
+Cause: model_not_found
+Recommendation: Fix model_path to a valid location (e.g., './models/qwen2.5-7b').
+Estimated memory: 3584 MB
+Available memory: 8192 MB
+Outputs: C:\Users\rguhaneogi\source\repos\AMD-DeveloperHack\replaylab\runs\diag_tmp_bad_model

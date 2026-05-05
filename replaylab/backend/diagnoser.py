@@ -80,7 +80,9 @@ def compare_runs(bad_run_dir: str | Path, good_run_dir: str | Path) -> dict[str,
     good_memory_pressure = bool(good_metrics.get("memory_pressure"))
     bad_batch = bad_metrics.get("batch_size")
     good_batch = good_metrics.get("batch_size")
+    bad_failure_type = bad_metrics.get("failure_type")
 
+    # Pattern 1: Memory pressure from oversized batch
     if bad_memory_pressure and not good_memory_pressure:
         cause = "memory pressure due to oversized batch size"
         confidence = "high"
@@ -92,6 +94,35 @@ def compare_runs(bad_run_dir: str | Path, good_run_dir: str | Path) -> dict[str,
             f"{good_metrics.get('estimated_memory_mb')} MB and clearing memory pressure."
         )
         recommended_fix = f"Reduce batch size from {bad_batch} to {good_batch}"
+
+    # Pattern 2: Model path not found
+    elif bad_failure_type == "model_not_found" or (not bad_metrics.get("model_path_valid", True)):
+        bad_path = bad_metrics.get("model_path", "unknown")
+        good_path = good_metrics.get("model_path", "unknown")
+        cause = "model path does not exist"
+        confidence = "high"
+        explanation = (
+            f"The failed run tried to load from '{bad_path}' which does not exist. "
+            f"The recovered run uses '{good_path}' which is a valid path."
+        )
+        recommended_fix = f"Change model_path from '{bad_path}' to '{good_path}'"
+        key_difference["model_path"] = {"bad": bad_path, "good": good_path}
+
+    # Pattern 3: Timeout exceeded
+    elif bad_failure_type == "timeout_exceeded" or bad_metrics.get("timed_out"):
+        bad_items = bad_metrics.get("items", "?")
+        good_items = good_metrics.get("items", "?")
+        bad_max_dur = bad_metrics.get("max_duration_sec", "?")
+        cause = "processing timeout exceeded"
+        confidence = "high"
+        explanation = (
+            f"The failed run attempted to process {bad_items} items within {bad_max_dur}s timeout. "
+            f"The recovered run uses {good_items} items which completes within the time limit."
+        )
+        recommended_fix = f"Reduce items from {bad_items} to {good_items}"
+        key_difference["items"] = {"bad": bad_items, "good": good_items}
+        key_difference["timed_out"] = {"bad": True, "good": False}
+
     else:
         cause = bad_artifact.get("cause") or "unknown failure pattern"
         confidence = "low"
