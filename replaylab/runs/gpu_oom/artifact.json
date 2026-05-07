@@ -1,0 +1,8 @@
+{
+  "status": "failed",
+  "cause": "gpu_oom_insufficient_memory_utilization",
+  "summary": "vLLM failed to start: gpu_memory_utilization=0.08 limits usable VRAM to ~15GB, but model weights alone require 14.35 GiB, leaving -1.84 GiB for KV cache.",
+  "recommendation": "Increase gpu_memory_utilization from 0.08 to 0.9 to allow full use of MI300X 192GB VRAM.",
+  "experiment_name": "gpu_oom_constrained_memory",
+  "model_name": "Qwen/Qwen2.5-7B-Instruct"
+}

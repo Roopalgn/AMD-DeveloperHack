@@ -1,0 +1,23 @@
+{
+  "status": "failed",
+  "failure_type": "gpu_oom",
+  "scenario": "oom",
+  "exit_code": 1,
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "gpu": "AMD Instinct MI300X",
+  "vram_total_gb": 192,
+  "vllm_version": "0.17.1",
+  "rocm_version": "7.2.0",
+  "max_model_len": 32768,
+  "gpu_memory_utilization": 0.08,
+  "effective_vram_gb": 15.36,
+  "model_weight_gib": 14.35,
+  "available_kv_cache_gib": -1.84,
+  "error": "ValueError: No available memory for the cache blocks",
+  "memory_pressure": true,
+  "batch_size": 32768,
+  "available_memory_mb": 15729,
+  "estimated_memory_mb": 16613,
+  "throughput_items_per_sec": 0,
+  "timestamp": "2026-05-07T03:20:52Z"
+}

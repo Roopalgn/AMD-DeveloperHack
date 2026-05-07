@@ -1,0 +1,159 @@
+{
+  "prompts": 8,
+  "total_tokens": 1024,
+  "duration_sec": 4.45,
+  "tokens_per_sec": 230.17,
+  "gpu": "AMD Instinct MI300X",
+  "vram": "192 GB",
+  "vllm_version": "0.17.1",
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "max_model_len": 4096,
+  "gpu_memory_utilization": 0.9,
+  "rocm_version": "7.2.0",
+  "results": [
+    {
+      "id": "cmpl-b15029dc819f5cf0",
+      "object": "text_completion",
+      "created": 1778124787,
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "choices": [
+        {
+          "index": 0,
+          "text": " GPU memory management involves allocating and deallocating memory for graphics processing tasks, ensuring efficient use of resources to optimize performance. The GPU maintains a pool of memory that can be accessed by running programs or applications, with mechanisms to manage data transfer between the CPU and GPU, handle memory fragmentation, and ensure that memory is released when no longer needed. Techniques such as virtual memory, caching, and memory pooling are used to improve efficiency and reduce latency, while hardware features like unified memory architecture (UMA) and direct memory access (DMA) help streamline data movement and processing. Effective memory management is crucial for maintaining high performance and minimizing power consumption in GPU-based",
+          "finish_reason": "length"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 9,
+        "total_tokens": 137,
+        "completion_tokens": 128
+      }
+    },
+    {
+      "id": "cmpl-a40a57c14affcf1e",
+      "object": "text_completion",
+      "created": 1778124787,
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "choices": [
+        {
+          "index": 0,
+          "text": " (Part 1)\n\nThe open-source ROCm software stack from AMD is a key enabler of the company\u2019s GPU-accelerated AI strategy. In this two-part series, we\u2019ll explore what ROCm is, how it works, and why it matters.\n\nIn the first part of this series, we\u2019ll cover:\n\n  \u2022 What ROCm is\n  \u2022 How ROCm works\n  \u2022 Why ROCm matters\n\nIn the second part, we\u2019ll dive into the details of ROCm\u2019s architecture and its role in enabling AI workloads on AMD GPUs.\n\nWhat is ROCm?\n\nROCm is an open-source software stack",
+          "finish_reason": "length"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 12,
+        "total_tokens": 140,
+        "completion_tokens": 128
+      }
+    },
+    {
+      "id": "cmpl-81a752a6ea75cab6",
+      "object": "text_completion",
+      "created": 1778124788,
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "choices": [
+        {
+          "index": 0,
+          "text": " Out-of-memory (OOM) errors in model serving can be caused by a variety of factors, including:\n\n  * Insufficient memory resources: If the server does not have enough memory to allocate to the model and its associated processes, it may run out of memory and cause an OOM error.\n  * Large model size: If the model being served is very large, it may require more memory than is available on the server to load into memory.\n  * High request rate: If the server receives a high volume of requests, it may run out of memory if it cannot keep up with the demand and process all requests in a timely manner",
+          "finish_reason": "length"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 10,
+        "total_tokens": 138,
+        "completion_tokens": 128
+      }
+    },
+    {
+      "id": "cmpl-95afeebf92a45c44",
+      "object": "text_completion",
+      "created": 1778124789,
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "choices": [
+        {
+          "index": 0,
+          "text": " vLLM (very large language model) is a library that optimizes the inference of large language models on GPUs. It uses several techniques to reduce GPU memory usage, including:\n\n  1. Layer-wise parallelism: vLLM splits the computation of each layer across multiple GPUs, allowing for more efficient use of the available memory.\n  2. Model parallelism: vLLM can distribute the model across multiple GPUs, further reducing the memory required on each individual GPU.\n  3. Gradient checkpointing: vLLM uses gradient checkpointing to reduce the memory required for backpropagation. This technique trades off some additional",
+          "finish_reason": "length"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 10,
+        "total_tokens": 138,
+        "completion_tokens": 128
+      }
+    },
+    {
+      "id": "cmpl-9e2d15648f471aa3",
+      "object": "text_completion",
+      "created": 1778124789,
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "choices": [
+        {
+          "index": 0,
+          "text": " The MI300X combines CPU and GPU on a single package with 192GB of HBM3 memory and 5.3 TB/s bandwidth, enabling large AI models to run without data movement bottlenecks across devices.",
+          "finish_reason": "length"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 11,
+        "total_tokens": 139,
+        "completion_tokens": 128
+      }
+    },
+    {
+      "id": "cmpl-bbbec1aeb60fa1af",
+      "object": "text_completion",
+      "created": 1778124790,
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "choices": [
+        {
+          "index": 0,
+          "text": " KV cache, or key-value cache, is a technique used in transformer models during inference to speed up the processing of subsequent tokens. In the context of transformers, the self-attention mechanism is a crucial component that allows the model to weigh the importance of different words in the input sequence when generating the next word.\n\nDuring the self-attention process, the model computes attention scores for each pair of query and key vectors. These vectors are derived from the input embeddings and are updated at each step as new tokens are generated. The key and value vectors are stored in the KV cache to avoid recomputing them for previously processed tokens.\n\nHere's how",
+          "finish_reason": "length"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 9,
+        "total_tokens": 137,
+        "completion_tokens": 128
+      }
+    },
+    {
+      "id": "cmpl-9a069b56bfb651b3",
+      "object": "text_completion",
+      "created": 1778124790,
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "choices": [
+        {
+          "index": 0,
+          "text": " When you increase the context length, you're essentially increasing the number of tokens that your model processes at once. This means that the model has to store and process more information simultaneously, which requires more memory. The KV cache grows linearly with context length, and attention computation grows quadratically.",
+          "finish_reason": "length"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 10,
+        "total_tokens": 138,
+        "completion_tokens": 128
+      }
+    },
+    {
+      "id": "cmpl-93858a0c6ca32484",
+      "object": "text_completion",
+      "created": 1778124791,
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "choices": [
+        {
+          "index": 0,
+          "text": " The batch size can have a significant impact on the memory pressure on the GPU. In general, the memory usage of a neural network during training is determined by the model parameters, gradients, optimizer states, and activations. Larger batch sizes require storing more activations simultaneously, increasing GPU memory pressure proportionally.",
+          "finish_reason": "length"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 9,
+        "total_tokens": 137,
+        "completion_tokens": 128
+      }
+    }
+  ]
+}

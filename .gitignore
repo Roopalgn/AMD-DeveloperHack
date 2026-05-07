@@ -4,4 +4,13 @@ __pycache__/
 # ReplayLab runtime outputs
 replaylab/runs/*
 !replaylab/runs/.gitkeep
+!replaylab/runs/gpu_oom/
+!replaylab/runs/gpu_recovered/
+!replaylab/runs/gpu_evidence/
+!replaylab/runs/bad_run/
+!replaylab/runs/good_run/
+!replaylab/runs/replay_run/
+
+# Scratch files
+prompt.txt
 
