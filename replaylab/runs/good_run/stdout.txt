@@ -1,5 +1,0 @@
-ReplayLab demo run: SUCCEEDED
-Throughput: 701369.863 items/sec
-Estimated memory: 3584 MB
-Available memory: 8192 MB
-Outputs: C:\Users\roopa\OneDrive\Desktop\AMD-DeveloperHack\replaylab\runs\tmp_good

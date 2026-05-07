@@ -165,6 +165,45 @@ Applies to:
 ### Deadline
 - Check Event Schedule tab (shown in local timezone)
 
+## Kickoff Stream Additions (From yt_transcribe.txt)
+
+These are operational details mentioned in the kickoff stream that were not explicitly captured above.
+
+### Registration and Program Flow
+- Hackathon registration flow: enroll on lablab.ai, click "Sign up with AMD", create AMD AI Developer Program account, then return to lablab.ai enrolled.
+- Organizers stated that registering through this flow effectively enrolls participants into AMD AI Developer Program for hackathon access.
+
+### Team and Participation Operations
+- Team size guidance from kickoff: 1 to 6 members.
+- Solo participants still need to create a one-person team.
+- Hybrid teams are allowed (online + on-site members in same team).
+- On-site attendance requires confirmation follow-up email from organizers after registration.
+
+### Discord and Support Workflow
+- Curated Discord Q&A mentioned for kickoff day at 10:00 AM PDT.
+- Organizers asked participants to use the AMD hackathon-specific Discord channels for support.
+- Mentor tagging guidance from kickoff:
+  - Tag `@mentors` for general hackathon help.
+  - Tag `@AMD mentors` for AMD-specific technical help.
+
+### Submission Format Details
+- Video submission guidance from kickoff:
+  - MP4 file upload directly in submission form.
+  - Suggested maximum length: 5 minutes.
+  - Suggested size limit: up to 300 MB.
+  - Organizers explicitly said not to submit video links.
+- Submission form flow also includes selecting:
+  - Track/category.
+  - Participation mode (online or on-site).
+
+### Additional Partner and Ecosystem Notes
+- Kickoff opening remarks included a larger partner lineup mention beyond core tech tracks (including Hugging Face, Akash Systems, Qwen, MindsDB, and others named by organizers).
+- Hugging Face VP remarks referenced internal AMD compatibility CI monitoring for HF models and highlighted high AMD test pass rates in their daily checks.
+
+### AMD Platform Notes Mentioned in Kickoff
+- AMD speaker remarks referenced MI300 and MI355 availability context in AMD developer cloud messaging.
+- AMD engineering support on Discord was explicitly emphasized in kickoff remarks.
+
 ## Judging Criteria
 
 - Application of technology
