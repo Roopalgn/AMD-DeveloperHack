@@ -1,0 +1,38 @@
+{
+  "capture_timestamp": "2026-05-08T13:12:45Z",
+  "hardware": "AMD Instinct MI300X (192 GB HBM3)",
+  "software": "vLLM 0.17.1, ROCm 7.2.0",
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "measurements": {
+    "model_load": {
+      "cold_start_sec": 8.42,
+      "warm_restart_sec": 2.58,
+      "model_size_gib": 14.35,
+      "throughput_gib_per_sec": 1.70
+    },
+    "compilation": {
+      "torch_compile_cold_sec": 16.28,
+      "torch_compile_warm_sec": 5.95,
+      "cuda_graph_capture_sec": 6.0,
+      "cuda_graph_memory_gib": 0.41
+    },
+    "inference": {
+      "prompts_processed": 8,
+      "total_tokens_generated": 1842,
+      "throughput_tok_per_sec": 230.17,
+      "time_to_first_token_ms": 180,
+      "inter_token_latency_ms": 4.3,
+      "batch_sizes_tested": [1, 4, 8]
+    },
+    "kv_cache": {
+      "allocated_gib": 155.31,
+      "token_capacity": 2908128,
+      "max_concurrent_32k_sequences": 88
+    },
+    "server_startup": {
+      "total_cold_start_sec": 52,
+      "total_warm_start_sec": 18,
+      "includes": ["model_load", "torch_compile", "cuda_graph", "kv_cache_init"]
+    }
+  }
+}

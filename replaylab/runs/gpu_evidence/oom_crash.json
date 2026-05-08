@@ -1,0 +1,28 @@
+{
+  "capture_timestamp": "2026-05-08T13:14:17Z",
+  "failure_type": "OOM_KV_CACHE",
+  "hardware": {
+    "gpu": "AMD Instinct MI300X",
+    "vram_total_gib": 192
+  },
+  "config": {
+    "model": "Qwen/Qwen2.5-7B-Instruct",
+    "gpu_memory_utilization": 0.08,
+    "max_model_len": 32768,
+    "dtype": "float16"
+  },
+  "result": {
+    "model_weights_gib": 14.35,
+    "available_kv_cache_gib": -1.79,
+    "error": "ValueError: No available memory for the cache blocks. Try increasing `gpu_memory_utilization` when initializing the engine.",
+    "exit_status": "crash",
+    "engine_core_status": "EngineCore failed to start"
+  },
+  "root_cause": "gpu_memory_utilization=0.08 reserves only 8% of 192 GiB (15.36 GiB) for all purposes. After loading 14.35 GiB of model weights, only ~1 GiB remains — far below the ~17 GiB needed for KV cache at max_model_len=32768. Result: negative available KV cache memory (-1.79 GiB).",
+  "fix_applied": {
+    "parameter": "gpu_memory_utilization",
+    "old_value": 0.08,
+    "new_value": 0.90,
+    "reasoning": "Increase VRAM allocation from 8% to 90%, giving 172.8 GiB total budget — enough for weights (14.35 GiB) + KV cache (155+ GiB)"
+  }
+}

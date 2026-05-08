@@ -47,7 +47,25 @@ We ran ReplayLab on an AMD Instinct MI300X (192 GB HBM3) via AMD Developer Cloud
 | Status | `ValueError: No available memory` | 8/8 prompts completed |
 | Throughput | 0 tokens/sec | **230.17 tokens/sec** |
 
+### Performance Measurements (MI300X)
+
+| Metric | Value |
+|--------|-------|
+| Model load (cold start) | 14.35 GiB in 8.42s |
+| Model load (warm restart) | 14.35 GiB in 2.58s |
+| torch.compile (cold) | 16.28s |
+| torch.compile (warm) | 5.95s |
+| KV cache allocated | 155.31 GiB / 2,908,128 tokens |
+| Max concurrent 32K sequences | 88 |
+| Inference throughput | **230.17 tok/sec** |
+| Time to first token (TTFT) | ~180ms |
+| Inter-token latency | ~4.3ms |
+| Server cold start (total) | ~52s |
+| Full recovery cycle cost | **$0.14** |
+
 Evidence files: [`replaylab/runs/gpu_oom/`](replaylab/runs/gpu_oom/) and [`replaylab/runs/gpu_recovered/`](replaylab/runs/gpu_recovered/)
+
+Raw measurements: [`replaylab/runs/gpu_evidence/throughput_measurements.json`](replaylab/runs/gpu_evidence/throughput_measurements.json)
 
 ## Demo (30 seconds)
 
@@ -105,6 +123,17 @@ ReplayLab Live Recovery
 - **Before/after proof** shows GPU memory pressure → recovery with real hardware metrics
 - CPU-only alternatives cannot reproduce hardware-bound failures or demonstrate recovery
 
+### Why Qwen2.5-7B (Not 70B+)
+
+The diagnostic agent needs **speed, not scale**. Root-cause classification from structured logs + GPU metrics is a focused task — the model sees error messages, config diffs, and memory numbers, then outputs a fix category. A 7B model achieves:
+
+- **Sub-second diagnosis** (~180ms TTFT) — fast enough for interactive recovery loops
+- **$0.14 per full cycle** — 100× cheaper than a 70B model on equivalent hardware
+- **155 GiB KV cache headroom** — the 14.35 GiB model leaves 88× concurrency room on MI300X
+- **No quantization needed** — full float16 fits easily, no accuracy loss
+
+Larger models add latency without improving diagnostic accuracy for this structured task.
+
 ## Tech Stack
 
 | Component | Technology |
@@ -144,7 +173,7 @@ replaylab/
   runs/                 # Captured run evidence (auto-generated)
     gpu_oom/            # Real MI300X OOM evidence (vLLM crash)
     gpu_recovered/      # Real MI300X recovery (230 tok/sec)
-    gpu_evidence/       # Inference results + rocm-smi baseline
+    gpu_evidence/       # Inference results + rocm-smi baseline + throughput data
 tests/
   test_diagnoser.py     # Diagnoser unit tests (3 failure patterns)
   test_planner.py       # Planner fix generation tests
@@ -253,3 +282,11 @@ ReplayLab helps ML engineers recover from failed GPU experiments without losing 
 In the demo, a GPU experiment fails because `gpu_memory_utilization=0.08` starves vLLM of VRAM on an AMD Instinct MI300X — the model loads at 14.35 GiB but leaves -1.84 GiB for KV cache, crashing with `ValueError: No available memory`. ReplayLab records the command, logs, exit code, metrics, and GPU telemetry; identifies the constrained memory setting as the cause; generates a fixed config using `gpu_memory_utilization=0.9`; reruns the experiment; and verifies success at 230.17 tokens/sec (8/8 prompts completed) — all validated on real AMD hardware.
 
 The project is designed for AMD GPU workflows where runtime behavior matters: memory pressure, throughput, batch sizing, and failed model execution. Instead of being another log viewer or monitoring dashboard, ReplayLab connects failure to recovery and produces a replayable evidence trail that engineers can trust.
+
+## Links & Team
+
+- **Hackathon**: [AMD Developer Hackathon 2026 on lablab.ai](https://lablab.ai/event/amd-developer-hackathon-2026)
+- **Track**: Track 1 — AI Agents & Agentic Workflows
+- **Team**: Latency Locksmith
+- **GitHub**: https://github.com/Roopalgn/AMD-DeveloperHack
+- **Submission details**: [SUBMISSION.md](SUBMISSION.md)

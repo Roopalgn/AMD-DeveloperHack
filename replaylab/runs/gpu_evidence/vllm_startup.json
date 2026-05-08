@@ -1,0 +1,42 @@
+{
+  "capture_timestamp": "2026-05-08T13:08:06Z",
+  "hardware": {
+    "gpu": "AMD Instinct MI300X",
+    "vram_total_gib": 192,
+    "hbm_type": "HBM3"
+  },
+  "software": {
+    "rocm_version": "7.2.0",
+    "vllm_version": "0.17.1",
+    "pytorch_backend": "nccl",
+    "attention_backend": "Triton"
+  },
+  "model": {
+    "name": "Qwen/Qwen2.5-7B-Instruct",
+    "architecture": "Qwen2ForCausalLM",
+    "dtype": "float16",
+    "max_model_len": 32768,
+    "weights_gib": 14.35,
+    "loading_time_sec": 8.42
+  },
+  "kv_cache": {
+    "available_gib": 155.31,
+    "total_tokens": 2908128,
+    "max_concurrency_at_32k": "88.75x"
+  },
+  "compilation": {
+    "torch_compile_sec": 16.28,
+    "cuda_graph_capture_sec": 6,
+    "cuda_graph_memory_gib": 0.41,
+    "engine_init_total_sec": 26.47
+  },
+  "server": {
+    "host": "0.0.0.0",
+    "port": 8000,
+    "gpu_memory_utilization": 0.90,
+    "chunked_prefill": true,
+    "max_batched_tokens": 8192,
+    "async_scheduling": true,
+    "status": "Application startup complete"
+  }
+}

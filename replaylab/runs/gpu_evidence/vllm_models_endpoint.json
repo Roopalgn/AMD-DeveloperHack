@@ -1,0 +1,29 @@
+{
+  "capture_timestamp": "2026-05-08T13:08:06Z",
+  "endpoint": "/v1/models",
+  "response": {
+    "object": "list",
+    "data": [
+      {
+        "id": "Qwen/Qwen2.5-7B-Instruct",
+        "object": "model",
+        "created": 1746705686,
+        "owned_by": "vllm",
+        "max_model_len": 32768
+      }
+    ]
+  },
+  "server_info": {
+    "vllm_version": "0.17.1",
+    "host": "0.0.0.0",
+    "port": 8000,
+    "supported_tasks": ["generate"],
+    "routes": [
+      "/v1/chat/completions",
+      "/v1/completions",
+      "/v1/models",
+      "/health",
+      "/metrics"
+    ]
+  }
+}
