@@ -31,6 +31,10 @@ FAIL → RECORD → DIAGNOSE → FIX → REPLAY → VERIFY
 
 We ran ReplayLab on an AMD Instinct MI300X (192 GB HBM3) via AMD Developer Cloud with vLLM 0.17.1 / ROCm 7.2.0 and Qwen2.5-7B-Instruct.
 
+![AMD Developer Cloud — MI300X instance running](docs/screenshots/amd_cloud_vm.png)
+
+![rocm-smi showing active GPU utilization during inference](docs/screenshots/rocm_smi_active.png)
+
 | Metric | OOM Run (bad) | Recovered Run (good) |
 |--------|--------------|---------------------|
 | `gpu_memory_utilization` | 0.08 (deliberately constrained) | 0.9 |
@@ -42,6 +46,8 @@ We ran ReplayLab on an AMD Instinct MI300X (192 GB HBM3) via AMD Developer Cloud
 Evidence files: [`replaylab/runs/gpu_oom/`](replaylab/runs/gpu_oom/) and [`replaylab/runs/gpu_recovered/`](replaylab/runs/gpu_recovered/)
 
 ## Demo (30 seconds)
+
+![ReplayLab full demo with LLM diagnosis on AMD MI300X](docs/screenshots/full_demo_llm.png)
 
 ```bash
 python replaylab/backend/full_demo.py
@@ -196,6 +202,8 @@ This is not a log viewer or a dashboard. It's a closed-loop recovery agent with 
 | GPU workloads (batch processing) | **Demo mode locally** | Uses simulated experiment; real GPU path on AMD Cloud |
 
 ## Cost Analysis
+
+![AMD Developer Cloud credits usage](docs/screenshots/amd_credits.png)
 
 | Metric | Value |
 |--------|-------|
