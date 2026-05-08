@@ -35,6 +35,10 @@ We ran ReplayLab on an AMD Instinct MI300X (192 GB HBM3) via AMD Developer Cloud
 
 ![rocm-smi showing active GPU utilization during inference](docs/screenshots/rocm_smi_active.png)
 
+![vLLM successful startup — 155 GiB KV cache, 88x concurrency on MI300X](docs/screenshots/vllm_startup.png)
+
+![vLLM OOM crash — negative KV cache memory, ValueError on constrained GPU](docs/screenshots/vllm_oom_crash.png)
+
 | Metric | OOM Run (bad) | Recovered Run (good) |
 |--------|--------------|---------------------|
 | `gpu_memory_utilization` | 0.08 (deliberately constrained) | 0.9 |
