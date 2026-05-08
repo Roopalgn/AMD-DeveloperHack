@@ -94,14 +94,14 @@ code { background: #21262d; padding: 0.5rem 0.8rem; border-radius: 4px; display:
   <div class="card bad">
     <h3>Failed Run</h3>
     <span class="metric">batch_size: {{BAD_BATCH}}</span>
-    <span class="metric">memory_pressure: True</span>
+    <span class="metric">failure: {{BAD_FAILURE_TYPE}}</span>
     <span class="metric">throughput: 0</span>
     <span class="metric">exit_code: {{BAD_EXIT}}</span>
   </div>
   <div class="card good">
     <h3>Recovered Run</h3>
     <span class="metric">batch_size: {{GOOD_BATCH}}</span>
-    <span class="metric">memory_pressure: False</span>
+    <span class="metric">failure: none</span>
     <span class="metric">throughput: {{GOOD_THROUGHPUT}}</span>
     <span class="metric">exit_code: 0</span>
   </div>
@@ -243,7 +243,9 @@ def generate_report(
     """Generate an HTML timeline report from run data."""
     bad_batch = bad_metrics.get("batch_size", "?")
     bad_memory = bad_metrics.get("estimated_memory_mb", "?")
-    bad_exit = 1 if bad_metrics.get("memory_pressure") else 0
+    bad_status = bad_metrics.get("status", "failed")
+    bad_exit = 1 if bad_status == "failed" else 0
+    bad_failure_type = bad_metrics.get("failure_type") or "unknown"
     good_batch = good_metrics.get("batch_size", "?")
     good_memory = good_metrics.get("estimated_memory_mb", "?")
     throughput = good_metrics.get("throughput_items_per_sec", 0)
@@ -256,11 +258,20 @@ def generate_report(
 
     replay_command = fix.get("fixed_command", "python replaylab/demo/demo_experiment.py --config replaylab/demo/config_good.json --output replaylab/runs/replay")
 
+    # Failure summary based on actual failure type
+    if bad_failure_type == "model_not_found":
+        fail_summary = f"Run failed — model path '{bad_metrics.get('model_path', 'unknown')}' does not exist."
+    elif bad_failure_type == "timeout_exceeded":
+        fail_summary = f"Run failed — processing {bad_metrics.get('items', '?')} items exceeded timeout of {bad_metrics.get('max_duration_sec', '?')}s."
+    else:
+        fail_summary = f"Run failed with batch_size={bad_batch}, estimated memory {bad_memory} MB exceeds available."
+
     html = TEMPLATE
-    html = html.replace("{{FAIL_SUMMARY}}", f"Run failed with batch_size={bad_batch}, estimated memory {bad_memory} MB exceeds available.")
+    html = html.replace("{{FAIL_SUMMARY}}", fail_summary)
     html = html.replace("{{BAD_BATCH}}", str(bad_batch))
     html = html.replace("{{BAD_MEMORY}}", str(bad_memory))
     html = html.replace("{{BAD_EXIT}}", str(bad_exit))
+    html = html.replace("{{BAD_FAILURE_TYPE}}", bad_failure_type)
     html = html.replace("{{DIAGNOSIS_TEXT}}", explanation)
     html = html.replace("{{CAUSE}}", cause)
     html = html.replace("{{CONFIDENCE}}", str(confidence))
