@@ -285,7 +285,7 @@ The project is designed for AMD GPU workflows where runtime behavior matters: me
 
 ## Links & Team
 
-- **Hackathon**: [AMD Developer Hackathon 2026 on lablab.ai](https://lablab.ai/event/amd-developer-hackathon-2026)
+- **Hackathon**: [AMD Developer Hackathon 2026 on lablab.ai](https://lablab.ai/ai-hackathons/amd-developer)
 - **Track**: Track 1 — AI Agents & Agentic Workflows
 - **Team**: Latency Locksmith
 - **GitHub**: https://github.com/Roopalgn/AMD-DeveloperHack
