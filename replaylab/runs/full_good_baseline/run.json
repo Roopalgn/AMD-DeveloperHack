@@ -1,0 +1,22 @@
+{
+  "command": "python replaylab/demo/demo_experiment.py --config replaylab/demo/config_good.json --output replaylab/runs/full_tmp_good",
+  "copied_outputs": [
+    "metrics.json",
+    "artifact.json"
+  ],
+  "duration_sec": 0.148946,
+  "end_time": "2026-05-07T05:35:07.163467+00:00",
+  "exit_code": 0,
+  "resolved_command": [
+    "C:\\Python313\\python.exe",
+    "replaylab/demo/demo_experiment.py",
+    "--config",
+    "replaylab/demo/config_good.json",
+    "--output",
+    "replaylab/runs/full_tmp_good"
+  ],
+  "run_dir": "replaylab\\runs\\full_good_baseline",
+  "run_id": "full_good_baseline",
+  "source_output_dir": "replaylab\\runs\\full_tmp_good",
+  "start_time": "2026-05-07T05:35:07.014492+00:00"
+}

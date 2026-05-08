@@ -1,0 +1,6 @@
+ReplayLab demo run: FAILED
+Cause: batch_size_too_large_memory_pressure
+Recommendation: Reduce batch_size from 64 to 8 and rerun.
+Estimated memory: 10752 MB
+Available memory: 8192 MB
+Outputs: C:\Users\rguhaneogi\source\repos\AMD-DeveloperHack\replaylab\runs\full_tmp_bad

@@ -26,8 +26,8 @@ def get_scenarios() -> list[dict]:
         {
             "name": "Batch Size Overflow",
             "description": "batch_size=64 exceeds available memory, causing experiment failure",
-            "bad_dir": "replaylab/runs/bad_run",
-            "good_dir": "replaylab/runs/good_run",
+            "bad_dir": "replaylab/runs/full_bad_run",
+            "good_dir": "replaylab/runs/full_good_baseline",
         },
     ]
 
