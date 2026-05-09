@@ -1,0 +1,13 @@
+{
+  "status": "failed",
+  "failure_type": "timeout_exceeded",
+  "scenario": "timeout",
+  "exit_code": 1,
+  "total_prompts": 20,
+  "completed": 13,
+  "errors": 0,
+  "duration_sec": 30.585,
+  "max_duration_sec": 30.0,
+  "timed_out": true,
+  "throughput_items_per_sec": 0.425
+}

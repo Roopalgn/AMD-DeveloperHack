@@ -1,0 +1,62 @@
+{
+  "status": "succeeded",
+  "failure_type": null,
+  "scenario": "recovered",
+  "exit_code": 0,
+  "gpu_memory_before": {
+    "card0": {
+      "VRAM Total Memory (B)": "205822885888",
+      "VRAM Total Used Memory (B)": "187005718528"
+    }
+  },
+  "gpu_memory_after": {
+    "card0": {
+      "VRAM Total Memory (B)": "205822885888",
+      "VRAM Total Used Memory (B)": "187005718528"
+    }
+  },
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "max_model_len": 32768,
+  "gpu_memory_utilization": 0.9,
+  "inference_results": [
+    {
+      "sec": 0.5755,
+      "usage": {
+        "prompt_tokens": 9,
+        "total_tokens": 140,
+        "completion_tokens": 131,
+        "prompt_tokens_details": null
+      }
+    },
+    {
+      "sec": 1.1103,
+      "usage": {
+        "prompt_tokens": 12,
+        "total_tokens": 268,
+        "completion_tokens": 256,
+        "prompt_tokens_details": null
+      }
+    },
+    {
+      "sec": 1.1146,
+      "usage": {
+        "prompt_tokens": 15,
+        "total_tokens": 271,
+        "completion_tokens": 256,
+        "prompt_tokens_details": null
+      }
+    },
+    {
+      "sec": 1.1119,
+      "usage": {
+        "prompt_tokens": 10,
+        "total_tokens": 266,
+        "completion_tokens": 256,
+        "prompt_tokens_details": null
+      }
+    }
+  ],
+  "throughput_prompts_per_sec": 1.022,
+  "batch_size": 4,
+  "duration_sec": 3.913
+}

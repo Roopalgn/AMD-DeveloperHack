@@ -1,0 +1,6 @@
+{
+  "status": "failed",
+  "cause": "timeout_exceeded",
+  "summary": "Only 13/20 completed in 30.0s budget.",
+  "recommendation": "Reduce concurrent prompts or increase timeout budget."
+}

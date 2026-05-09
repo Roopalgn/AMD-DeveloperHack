@@ -1,0 +1,16 @@
+(APIServer pid=961) INFO 05-07 03:20:29 [utils.py:238] non-default args: {'port': 8001, 'model': 'Qwen/Qwen2.5-7B-Instruct', 'max_model_len': 32768, 'gpu_memory_utilization': 0.08}
+(APIServer pid=961) INFO 05-07 03:20:30 [model.py:531] Resolved architecture: Qwen2ForCausalLM
+(APIServer pid=961) INFO 05-07 03:20:30 [model.py:1554] Using max model len 32768
+(EngineCore_DP0 pid=1034) INFO 05-07 03:20:36 [core.py:101] Initializing a V1 LLM engine (v0.17.1) with config: model='Qwen/Qwen2.5-7B-Instruct', dtype=torch.bfloat16, max_seq_len=32768, gpu_memory_utilization=0.08
+(EngineCore_DP0 pid=1034) INFO 05-07 03:20:37 [parallel_state.py:1393] world_size=1 rank=0 local_rank=0
+(EngineCore_DP0 pid=1034) INFO 05-07 03:20:37 [gpu_model_runner.py:4281] Starting to load model Qwen/Qwen2.5-7B-Instruct...
+(EngineCore_DP0 pid=1034) INFO 05-07 03:20:38 [rocm.py:463] Using Triton Attention backend.
+Loading safetensors checkpoint shards: 100% Completed | 4/4 [00:05<00:00, 1.34s/it]
+(EngineCore_DP0 pid=1034) INFO 05-07 03:20:43 [default_loader.py:293] Loading weights took 5.46 seconds
+(EngineCore_DP0 pid=1034) INFO 05-07 03:20:44 [gpu_model_runner.py:4364] Model loading took 14.35 GiB memory and 5.984612 seconds
+(EngineCore_DP0 pid=1034) INFO 05-07 03:20:52 [gpu_worker.py:424] Available KV cache memory: -1.84 GiB
+(EngineCore_DP0 pid=1034) ERROR 05-07 03:20:52 [core.py:1100] EngineCore failed to start.
+(EngineCore_DP0 pid=1034) ERROR 05-07 03:20:52 [core.py:1100] ValueError: No available memory for the cache blocks. Try increasing `gpu_memory_utilization` when initializing the engine.
+(EngineCore_DP0 pid=1034) ERROR 05-07 03:20:52 [core.py:1100]   File "/usr/local/lib/python3.12/dist-packages/vllm/v1/core/kv_cache_utils.py", line 623, in _check_enough_kv_cache_memory
+(EngineCore_DP0 pid=1034) ERROR 05-07 03:20:52 [core.py:1100]     raise ValueError(
+(APIServer pid=961) RuntimeError: Engine core initialization failed. See root cause above.
