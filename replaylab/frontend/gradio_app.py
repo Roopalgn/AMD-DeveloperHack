@@ -29,6 +29,12 @@ def get_scenarios() -> list[dict]:
             "bad_dir": "replaylab/runs/full_bad_run",
             "good_dir": "replaylab/runs/full_good_baseline",
         },
+        {
+            "name": "Processing Timeout",
+            "description": "100k items exceeds 2-second time limit — agent reduces workload to recover",
+            "bad_dir": "replaylab/runs/timeout_bad",
+            "good_dir": "replaylab/runs/timeout_good",
+        },
     ]
 
 
@@ -76,10 +82,25 @@ def run_scenario(scenario_name: str) -> tuple[str, str, str, str]:
 
 ### ❌ FAILURE DETECTED
 - **Status:** {bad_metrics.get('status', 'failed')}
+- **Failure Type:** {bad_metrics.get('failure_type', 'unknown')}
 - **Error:** {bad_metrics.get('error', bad_metrics.get('failure_type', 'unknown'))}
-- **GPU Memory Utilization:** {bad_metrics.get('gpu_memory_utilization', 'N/A')}
-- **Available KV Cache:** {bad_metrics.get('available_kv_cache_gib', 'N/A')} GiB
+"""
 
+    # Add scenario-specific details
+    if bad_metrics.get('gpu_memory_utilization') is not None:
+        timeline += f"- **GPU Memory Utilization:** {bad_metrics.get('gpu_memory_utilization')}\n"
+        timeline += f"- **Available KV Cache:** {bad_metrics.get('available_kv_cache_gib', 'N/A')} GiB\n"
+    if bad_metrics.get('batch_size') is not None:
+        timeline += f"- **Batch Size:** {bad_metrics.get('batch_size')}\n"
+    if bad_metrics.get('items') is not None:
+        timeline += f"- **Items:** {bad_metrics.get('items')}\n"
+    if bad_metrics.get('max_duration_sec') is not None:
+        timeline += f"- **Max Duration:** {bad_metrics.get('max_duration_sec')}s\n"
+    if bad_metrics.get('model_path') is not None:
+        timeline += f"- **Model Path:** `{bad_metrics.get('model_path')}`\n"
+        timeline += f"- **Path Valid:** {bad_metrics.get('model_path_valid', 'unknown')}\n"
+
+    timeline += """
 ### 🔍 DIAGNOSIS
 """
     if taxonomy_result:
@@ -94,9 +115,22 @@ def run_scenario(scenario_name: str) -> tuple[str, str, str, str]:
 
     timeline += f"""
 ### 🔧 FIX APPLIED
-- **gpu_memory_utilization:** {bad_metrics.get('gpu_memory_utilization', 0.08)} → {good_metrics.get('gpu_memory_utilization', 0.9)}
-- **max_model_len:** {bad_metrics.get('max_model_len', 32768)} → {good_metrics.get('max_model_len', 4096)}
+"""
+    # Dynamic fix details based on failure type
+    failure_type = bad_metrics.get('failure_type', '')
+    if 'memory' in str(failure_type) or 'oom' in str(failure_type) or bad_metrics.get('gpu_memory_utilization') is not None:
+        timeline += f"- **gpu_memory_utilization:** {bad_metrics.get('gpu_memory_utilization', 0.08)} → {good_metrics.get('gpu_memory_utilization', 0.9)}\n"
+        timeline += f"- **max_model_len:** {bad_metrics.get('max_model_len', 32768)} → {good_metrics.get('max_model_len', 4096)}\n"
+    elif 'model_not_found' in str(failure_type):
+        timeline += f"- **model_path:** `{bad_metrics.get('model_path', 'unknown')}` → `{good_metrics.get('model_path', 'valid path')}`\n"
+    elif 'timeout' in str(failure_type):
+        timeline += f"- **items:** {bad_metrics.get('items', '?')} → {good_metrics.get('items', '?')}\n"
+    elif bad_metrics.get('batch_size') and good_metrics.get('batch_size'):
+        timeline += f"- **batch_size:** {bad_metrics.get('batch_size')} → {good_metrics.get('batch_size')}\n"
+    else:
+        timeline += f"- **gpu_memory_utilization:** {bad_metrics.get('gpu_memory_utilization', 0.08)} → {good_metrics.get('gpu_memory_utilization', 0.9)}\n"
 
+    timeline += f"""
 ### ✅ RECOVERY VERIFIED
 - **Status:** {good_metrics.get('status', 'succeeded')}
 - **Throughput:** {good_metrics.get('tokens_per_sec', good_metrics.get('throughput_items_per_sec', 'N/A'))} tokens/sec

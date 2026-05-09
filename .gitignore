@@ -10,8 +10,15 @@ replaylab/runs/*
 !replaylab/runs/full_bad_run/
 !replaylab/runs/full_good_baseline/
 !replaylab/runs/replay_run/
+!replaylab/runs/timeout_bad/
+!replaylab/runs/timeout_good/
+!replaylab/runs/model_bad/
+!replaylab/runs/model_good/
 
 # Scratch files
 prompt.txt
 
 VIDEO_SCRIPT.md
+
+# Internal docs (not for repo)
+info.md

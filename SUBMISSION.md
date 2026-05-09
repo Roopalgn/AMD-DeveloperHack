@@ -60,7 +60,7 @@ The project is designed for AMD GPU workflows where runtime behavior matters: me
 | Inference throughput | 230.17 tok/sec |
 | Time to first token | ~180ms |
 | Full recovery cycle | ~4 min, $0.14 |
-| Tests | 26 passing |
+| Tests | 38 passing |
 
 ## Links
 
