@@ -1,0 +1,184 @@
+{
+  "timestamp": "2026-05-09T18:25:40Z",
+  "hardware": "AMD Instinct MI300X (192 GB HBM3)",
+  "software": "vLLM 0.17.1, ROCm 7.2.0",
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "max_model_len": 32768,
+  "gpu_memory_utilization": 0.9,
+  "throughput_sweep": [
+    {
+      "prompt": "short",
+      "max_tok": 64,
+      "batch": 1,
+      "ok": 1,
+      "fail": 0,
+      "comp_tok": 64,
+      "wall_sec": 0.283,
+      "avg_lat": 0.283,
+      "tok_per_sec": 226.14,
+      "ttft": 0.283
+    },
+    {
+      "prompt": "short",
+      "max_tok": 64,
+      "batch": 4,
+      "ok": 4,
+      "fail": 0,
+      "comp_tok": 256,
+      "wall_sec": 1.133,
+      "avg_lat": 0.2833,
+      "tok_per_sec": 225.9,
+      "ttft": 0.2833
+    },
+    {
+      "prompt": "short",
+      "max_tok": 64,
+      "batch": 8,
+      "ok": 8,
+      "fail": 0,
+      "comp_tok": 512,
+      "wall_sec": 2.265,
+      "avg_lat": 0.2831,
+      "tok_per_sec": 226.03,
+      "ttft": 0.2826
+    },
+    {
+      "prompt": "medium",
+      "max_tok": 128,
+      "batch": 1,
+      "ok": 1,
+      "fail": 0,
+      "comp_tok": 128,
+      "wall_sec": 0.562,
+      "avg_lat": 0.5618,
+      "tok_per_sec": 227.82,
+      "ttft": 0.5618
+    },
+    {
+      "prompt": "medium",
+      "max_tok": 128,
+      "batch": 4,
+      "ok": 4,
+      "fail": 0,
+      "comp_tok": 512,
+      "wall_sec": 2.239,
+      "avg_lat": 0.5598,
+      "tok_per_sec": 228.63,
+      "ttft": 0.5595
+    },
+    {
+      "prompt": "medium",
+      "max_tok": 128,
+      "batch": 8,
+      "ok": 8,
+      "fail": 0,
+      "comp_tok": 1024,
+      "wall_sec": 4.492,
+      "avg_lat": 0.5615,
+      "tok_per_sec": 227.96,
+      "ttft": 0.5614
+    },
+    {
+      "prompt": "long",
+      "max_tok": 256,
+      "batch": 1,
+      "ok": 1,
+      "fail": 0,
+      "comp_tok": 256,
+      "wall_sec": 1.131,
+      "avg_lat": 1.1309,
+      "tok_per_sec": 226.36,
+      "ttft": 1.1309
+    },
+    {
+      "prompt": "long",
+      "max_tok": 256,
+      "batch": 4,
+      "ok": 4,
+      "fail": 0,
+      "comp_tok": 1024,
+      "wall_sec": 4.506,
+      "avg_lat": 1.1265,
+      "tok_per_sec": 227.24,
+      "ttft": 1.1259
+    },
+    {
+      "prompt": "long",
+      "max_tok": 256,
+      "batch": 8,
+      "ok": 8,
+      "fail": 0,
+      "comp_tok": 2048,
+      "wall_sec": 9.027,
+      "avg_lat": 1.1284,
+      "tok_per_sec": 226.86,
+      "ttft": 1.126
+    }
+  ],
+  "concurrency_stress": [
+    {
+      "conc": 1,
+      "ok": 1,
+      "fail": 0,
+      "comp_tok": 64,
+      "wall_sec": 0.287,
+      "agg_tok_s": 222.92,
+      "p50": 0.2866,
+      "p95": 0.2866
+    },
+    {
+      "conc": 2,
+      "ok": 2,
+      "fail": 0,
+      "comp_tok": 128,
+      "wall_sec": 0.309,
+      "agg_tok_s": 414.84,
+      "p50": 0.3079,
+      "p95": 0.3079
+    },
+    {
+      "conc": 4,
+      "ok": 4,
+      "fail": 0,
+      "comp_tok": 256,
+      "wall_sec": 0.337,
+      "agg_tok_s": 758.64,
+      "p50": 0.3365,
+      "p95": 0.3369
+    },
+    {
+      "conc": 8,
+      "ok": 8,
+      "fail": 0,
+      "comp_tok": 512,
+      "wall_sec": 0.338,
+      "agg_tok_s": 1514.15,
+      "p50": 0.3359,
+      "p95": 0.3373
+    },
+    {
+      "conc": 16,
+      "ok": 16,
+      "fail": 0,
+      "comp_tok": 1024,
+      "wall_sec": 0.349,
+      "agg_tok_s": 2930.86,
+      "p50": 0.3452,
+      "p95": 0.3482
+    }
+  ],
+  "gpu_before": {
+    "card0": {
+      "GPU use (%)": "49",
+      "VRAM Total Memory (B)": "205822885888",
+      "VRAM Total Used Memory (B)": "187005718528"
+    }
+  },
+  "gpu_after": {
+    "card0": {
+      "GPU use (%)": "50",
+      "VRAM Total Memory (B)": "205822885888",
+      "VRAM Total Used Memory (B)": "187005718528"
+    }
+  }
+}
