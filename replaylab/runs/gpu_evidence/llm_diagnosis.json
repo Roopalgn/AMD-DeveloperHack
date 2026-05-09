@@ -1,0 +1,10 @@
+{
+  "timestamp": "2026-05-09T19:13:02Z",
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "hardware": "AMD Instinct MI300X (192 GB HBM3)",
+  "latency_sec": 0.604,
+  "prompt_tokens": 703,
+  "completion_tokens": 129,
+  "diagnosis_raw": "```json\n{\n  \"root_cause\": \"The user-specified max_model_len (65536) exceeds the derived max_model_len (32768.0) based on the model's configuration.\",\n  \"failure_category\": \"context_length_exceeded\",\n  \"recommended_fix\": \"Set the environment variable VLLM_ALLOW_LONG_MAX_MODEL_LEN=1 to allow overriding the maximum context length. However, use this setting with caution as it may lead to NaN values if the model uses RoPE or out-of-bounds errors if it uses absolute position encoding.\",\n  \"confidence\": 1\n}\n```",
+  "scenario": "gpu_oom"
+}
