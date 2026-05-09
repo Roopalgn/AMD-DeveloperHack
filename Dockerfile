@@ -9,4 +9,4 @@ COPY . .
 
 EXPOSE 7860
 
-CMD ["python", "-m", "uvicorn", "replaylab.backend.app:app", "--host", "0.0.0.0", "--port", "7860"]
+CMD ["python", "replaylab/frontend/gradio_app.py"]
