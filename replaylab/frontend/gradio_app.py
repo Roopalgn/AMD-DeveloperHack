@@ -161,6 +161,27 @@ def run_scenario(scenario_name: str) -> tuple[str, str, str, str]:
     else:
         diagnosis_text = f"Rule-based: {bad_metrics.get('failure_type', 'unknown')}"
 
+    # Add cached LLM diagnosis if available
+    llm_diag_path = Path("replaylab/runs/gpu_evidence/llm_diagnosis.json")
+    if llm_diag_path.exists():
+        llm_data = json.loads(llm_diag_path.read_text(encoding="utf-8"))
+        diagnosis_text += f"""
+
+### LLM Diagnosis (Qwen2.5-7B on MI300X, {llm_data.get('latency_sec', '?')}s)
+
+| Field | Value |
+|-------|-------|
+| Model | `{llm_data.get('model', 'Qwen2.5-7B')}` |
+| Hardware | {llm_data.get('hardware', 'AMD MI300X')} |
+| Latency | **{llm_data.get('latency_sec', '?')}s** |
+| Prompt Tokens | {llm_data.get('prompt_tokens', '?')} |
+| Completion Tokens | {llm_data.get('completion_tokens', '?')} |
+
+```
+{llm_data.get('diagnosis_raw', 'N/A')}
+```
+"""
+
     # Agent trace
     trace_text = """### Agent Reasoning Steps
 

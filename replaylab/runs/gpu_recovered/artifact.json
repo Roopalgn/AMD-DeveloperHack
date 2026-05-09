@@ -1,9 +1,6 @@
 {
   "status": "succeeded",
   "cause": null,
-  "summary": "Inference succeeded: 8/8 prompts completed, 1024 tokens generated in 4.45s (230.17 tokens/sec) on AMD Instinct MI300X with Qwen2.5-7B-Instruct via vLLM 0.17.1.",
-  "recommendation": "Keep max_model_len=4096 and gpu_memory_utilization=0.9 for stable serving on MI300X.",
-  "experiment_name": "gpu_recovered_inference",
-  "model_name": "Qwen/Qwen2.5-7B-Instruct",
-  "sample_output": "GPU memory management involves allocating and deallocating memory for graphics processing tasks, ensuring efficient use of resources to optimize performance."
+  "summary": "Inference succeeded: 4/4 prompts completed at 1.022 p/sec.",
+  "recommendation": "Keep max_model_len=32768 and gpu_memory_utilization=0.9 for stable serving."
 }

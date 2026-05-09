@@ -28,6 +28,8 @@ Built for the [AMD Developer Hackathon 2026](https://lablab.ai/event/amd-develop
 [![ROCm](https://img.shields.io/badge/ROCm-7.2.0-orange)](https://rocm.docs.amd.com/)
 [![vLLM](https://img.shields.io/badge/vLLM-0.17.1-blue)](https://github.com/vllm-project/vllm)
 [![Tests](https://img.shields.io/badge/tests-38_passing-brightgreen)]()
+[![Throughput](https://img.shields.io/badge/throughput-2%2C931_tok%2Fs_@16x-blue)]()
+[![VRAM](https://img.shields.io/badge/VRAM-192_GB_HBM3-ED1C24)]()
 
 ## The Problem
 
@@ -81,9 +83,9 @@ ReplayLab handles three distinct GPU failure patterns:
 
 | Scenario | Cause | Fix Applied | Recovery |
 |----------|-------|-------------|----------|
-| **GPU OOM** | `batch_size=64` exceeds VRAM | Reduce to `batch_size=8` | ✅ 648k items/sec |
-| **Model Not Found** | Invalid model path `/nonexistent/...` | Correct path to `./models/qwen2.5-7b` | ✅ Model loads successfully |
-| **Processing Timeout** | 100k items exceeds 2s limit | Reduce to 512 items | ✅ Completes within limit |
+| **GPU OOM** | `max_model_len=65536` exceeds VRAM | Reduce to `max_model_len=32768` | ✅ Real MI300X recovery |
+| **Batch Size Overflow** | `batch_size=64` exceeds VRAM | Reduce to `batch_size=8` | ✅ 648k items/sec |
+| **Processing Timeout** | 20 heavy prompts exceed 30s budget | Reduce concurrent load | ✅ 13/20 → all complete |
 
 ## vLLM Failure Taxonomy (Domain Knowledge)
 
@@ -123,12 +125,61 @@ ReplayLab's LLM agent is a **diagnostic sidecar**, not the main workload. The ex
 | torch.compile (warm) | 5.95s |
 | KV cache allocation | 155.31 GiB / 2,908,128 tokens |
 | Max concurrency (32K ctx) | 88 sequences |
-| Inference throughput | 230.17 tok/sec |
-| TTFT | ~180ms |
+| Inference throughput | 227 tok/sec (sustained) |
+| TTFT (short prompt) | 283 ms |
+| TTFT (long prompt) | 1,131 ms |
+| LLM diagnosis latency | 604 ms |
 | Full recovery cycle | ~4 min |
 | Cost per recovery | **$0.14** |
 | Manual debug cost (est.) | **$150.00** |
 | Speedup | **1,071×** cost reduction |
+
+### Throughput Sweep (Qwen2.5-7B-Instruct, max_model_len=32768)
+
+| Prompt Length | Batch Size | Tokens/sec | TTFT (s) | Avg Latency (s) |
+|--------------|-----------|------------|----------|------------------|
+| Short (~10 tok) | 1 | 226.1 | 0.283 | 0.283 |
+| Short (~10 tok) | 4 | 225.9 | 0.283 | 0.283 |
+| Short (~10 tok) | 8 | 226.0 | 0.283 | 0.283 |
+| Medium (~50 tok) | 1 | 227.8 | 0.562 | 0.562 |
+| Medium (~50 tok) | 4 | 228.6 | 0.560 | 0.560 |
+| Medium (~50 tok) | 8 | 228.0 | 0.561 | 0.562 |
+| Long (~200 tok) | 1 | 226.4 | 1.131 | 1.131 |
+| Long (~200 tok) | 4 | 227.2 | 1.126 | 1.127 |
+| Long (~200 tok) | 8 | 226.9 | 1.126 | 1.128 |
+
+### Concurrency Stress Test
+
+| Concurrent Requests | Aggregate tok/s | p50 Latency (s) | p95 Latency (s) | Scaling |
+|--------------------|-----------------|-----------------|-----------------|---------|
+| 1 | 222.9 | 0.287 | 0.287 | 1.0× |
+| 2 | 414.8 | 0.308 | 0.308 | 1.9× |
+| 4 | 758.6 | 0.337 | 0.337 | 3.4× |
+| 8 | 1,514.2 | 0.336 | 0.337 | 6.8× |
+| 16 | 2,930.9 | 0.345 | 0.348 | **13.1×** |
+
+> Near-linear scaling to 16 concurrent requests — p50 latency increases only 20% (287ms → 345ms) while aggregate throughput grows 13.1×. Zero failures across all tests.
+
+### rocm-smi During Benchmark
+
+```
+GPU[0] : GPU use (%): 25
+GPU[0] : VRAM Total Memory (B): 205,822,885,888 (192 GB)
+GPU[0] : VRAM Total Used Memory (B): 187,005,718,528 (174 GB, 91%)
+```
+
+### LLM Diagnosis (Real MI300X, 604ms)
+
+When fed an OOM crash log, Qwen2.5-7B running on MI300X diagnosed the failure in **604ms**:
+
+```json
+{
+  "root_cause": "max_model_len (65536) exceeds derived max (32768)",
+  "failure_category": "context_length_exceeded",
+  "recommended_fix": "Reduce max_model_len or set VLLM_ALLOW_LONG_MAX_MODEL_LEN=1",
+  "confidence": 1.0
+}
+```
 
 ## Agent Reasoning Trace
 
@@ -215,7 +266,7 @@ AMD-DeveloperHack/
 - [x] Public GitHub repository
 - [x] HF Space deployed (Gradio interactive demo)
 - [x] MIT License
-- [x] 3 failure scenarios (OOM, model path, timeout)
+- [x] 3 failure scenarios (GPU OOM, batch overflow, timeout)
 - [x] 10-pattern vLLM/ROCm failure taxonomy
 - [x] LLM-powered diagnosis agent (Qwen2.5-7B)
 - [x] Multi-step agent reasoning loop with traces

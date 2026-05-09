@@ -1,6 +1,0 @@
-{
-  "status": "failed",
-  "cause": "gpu_oom_max_model_len_too_large",
-  "summary": "vLLM failed to start: max_model_len=65536 exceeds GPU VRAM capacity.",
-  "recommendation": "Reduce max_model_len to 4096 and gpu_memory_utilization to 0.9."
-}

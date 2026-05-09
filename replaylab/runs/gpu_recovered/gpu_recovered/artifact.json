@@ -1,6 +1,0 @@
-{
-  "status": "succeeded",
-  "cause": null,
-  "summary": "Inference succeeded: 4/4 prompts completed at 1.022 p/sec.",
-  "recommendation": "Keep max_model_len=32768 and gpu_memory_utilization=0.9 for stable serving."
-}

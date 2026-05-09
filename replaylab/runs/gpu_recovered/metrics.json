@@ -3,27 +3,60 @@
   "failure_type": null,
   "scenario": "recovered",
   "exit_code": 0,
+  "gpu_memory_before": {
+    "card0": {
+      "VRAM Total Memory (B)": "205822885888",
+      "VRAM Total Used Memory (B)": "187005718528"
+    }
+  },
+  "gpu_memory_after": {
+    "card0": {
+      "VRAM Total Memory (B)": "205822885888",
+      "VRAM Total Used Memory (B)": "187005718528"
+    }
+  },
   "model": "Qwen/Qwen2.5-7B-Instruct",
-  "gpu": "AMD Instinct MI300X",
-  "vram_total_gb": 192,
-  "vllm_version": "0.17.1",
-  "rocm_version": "7.2.0",
-  "max_model_len": 4096,
+  "max_model_len": 32768,
   "gpu_memory_utilization": 0.9,
-  "effective_vram_gb": 172.8,
-  "model_weight_gib": 14.35,
-  "available_kv_cache_gib": 172.5,
-  "memory_pressure": false,
-  "batch_size": 8,
-  "available_memory_mb": 176947,
-  "estimated_memory_mb": 14694,
-  "throughput_items_per_sec": 230.17,
-  "total_prompts": 8,
-  "successful": 8,
-  "errors": 0,
-  "duration_sec": 4.45,
-  "total_tokens": 1024,
-  "tokens_per_sec": 230.17,
-  "avg_generation_throughput_tokens_sec": 102.4,
-  "timestamp": "2026-05-07T03:29:12Z"
+  "inference_results": [
+    {
+      "sec": 0.5755,
+      "usage": {
+        "prompt_tokens": 9,
+        "total_tokens": 140,
+        "completion_tokens": 131,
+        "prompt_tokens_details": null
+      }
+    },
+    {
+      "sec": 1.1103,
+      "usage": {
+        "prompt_tokens": 12,
+        "total_tokens": 268,
+        "completion_tokens": 256,
+        "prompt_tokens_details": null
+      }
+    },
+    {
+      "sec": 1.1146,
+      "usage": {
+        "prompt_tokens": 15,
+        "total_tokens": 271,
+        "completion_tokens": 256,
+        "prompt_tokens_details": null
+      }
+    },
+    {
+      "sec": 1.1119,
+      "usage": {
+        "prompt_tokens": 10,
+        "total_tokens": 266,
+        "completion_tokens": 256,
+        "prompt_tokens_details": null
+      }
+    }
+  ],
+  "throughput_prompts_per_sec": 1.022,
+  "batch_size": 4,
+  "duration_sec": 3.913
 }
