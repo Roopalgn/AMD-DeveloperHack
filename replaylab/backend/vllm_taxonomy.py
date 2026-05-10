@@ -42,7 +42,7 @@ VLLM_FAILURE_PATTERNS: list[dict[str, Any]] = [
     },
     {
         "id": "context_length_exceeded",
-        "pattern": r"maximum context length|max_model_len.*exceeds.*max_seq_len|This model's maximum context length",
+        "pattern": r"maximum context length|max_model_len.*(?:exceeds|greater than).*(?:max_seq_len|derived max_model_len|max_position_embeddings)|This model's maximum context length",
         "cause": "Requested context exceeds model or engine limits",
         "severity": "high",
         "explanation": (
