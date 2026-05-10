@@ -27,7 +27,7 @@ Built for the [AMD Developer Hackathon 2026](https://lablab.ai/event/amd-develop
 [![AMD MI300X](https://img.shields.io/badge/AMD-MI300X-ED1C24)](https://www.amd.com/)
 [![ROCm](https://img.shields.io/badge/ROCm-7.2.0-orange)](https://rocm.docs.amd.com/)
 [![vLLM](https://img.shields.io/badge/vLLM-0.17.1-blue)](https://github.com/vllm-project/vllm)
-[![Tests](https://img.shields.io/badge/tests-38_passing-brightgreen)]()
+[![Tests](https://github.com/Roopalgn/AMD-DeveloperHack/actions/workflows/test.yml/badge.svg)](https://github.com/Roopalgn/AMD-DeveloperHack/actions/workflows/test.yml)
 [![Throughput](https://img.shields.io/badge/throughput-2%2C931_tok%2Fs_@16x-blue)]()
 [![VRAM](https://img.shields.io/badge/VRAM-192_GB_HBM3-ED1C24)]()
 
@@ -103,6 +103,20 @@ ReplayLab handles three distinct GPU failure patterns:
 | `engine_dead_after_warmup` | critical | vLLM engine init failed |
 | `batch_too_large_runtime` | high | Runtime batch exceeds capacity |
 | `gpu_not_detected` | critical | No AMD GPU found by ROCm |
+
+## Why AMD MI300X
+
+ReplayLab is built for the **one GPU that can run diagnostics and the experiment simultaneously**:
+
+| Constraint | MI300X (192 GB HBM3) | H100 (80 GB HBM3) |
+|-----------|---------------------|--------------------|
+| Diagnostic sidecar (Qwen2.5-7B) | 14.35 GiB — fits trivially | 14.35 GiB — fits, but... |
+| Remaining for experiment model | **155+ GiB free** (70B+ models) | ~55 GiB free (≤34B models) |
+| Simultaneous debug + workload | ✅ Single card, no sharding | ❌ Requires multi-GPU or model swap |
+| Native GPU telemetry | `rocm-smi` / `amd-smi` — first-class | N/A (different toolchain) |
+| ROCm-specific failure patterns | 3 of 10 taxonomy patterns are ROCm-native (`rocm_version_mismatch`, `triton_attention_fallback`, `gpu_not_detected`) | N/A |
+
+The core design insight: a diagnostic agent must **never compete for VRAM** with the experiment it's debugging. MI300X's 192 GB means the 7B sidecar is invisible to the main workload — no model swapping, no sharding, no second GPU. On H100, you'd need to unload the experiment model to load the debugger, defeating the purpose of live diagnosis.
 
 ## Why Qwen2.5-7B (Not 70B+)
 
@@ -194,6 +208,51 @@ Each recovery produces a full reasoning chain:
 [verify_success]    Fix succeeded — recovery confirmed
 [cost_estimate]     $0.14 GPU vs $150 manual (1,071× faster)
 ```
+
+## Evidence (Real AMD MI300X)
+
+All data below was captured on AMD Developer Cloud — MI300X x1, $1.99/GPU/hour.
+
+### vLLM OOM Crash → Recovery
+
+![vLLM OOM Crash on MI300X](docs/screenshots/vllm_oom_crash.png)
+*vLLM crashes when `max_model_len=65536` exceeds the model's 32K context limit. ReplayLab catches this, diagnoses it, and recovers automatically.*
+
+### rocm-smi During Benchmark
+
+![rocm-smi Active](docs/screenshots/rocm_smi_active.png)
+*91% VRAM utilization (174 GB / 192 GB) during sustained inference benchmark — diagnostic sidecar coexists with the main workload.*
+
+### Full Recovery Pipeline with LLM Diagnosis
+
+![Full Demo with LLM](docs/screenshots/full_demo_llm.png)
+*End-to-end pipeline: failure detection → taxonomy match → LLM diagnosis (604ms) → fix generation → verified recovery.*
+
+### AMD Developer Cloud VM
+
+![AMD Cloud VM](docs/screenshots/amd_cloud_vm.png)
+*MI300X instance on AMD Developer Cloud used for all benchmarks and evidence collection.*
+
+## Business Value
+
+### Target Customers
+
+| Segment | Pain Point | ReplayLab Value |
+|---------|-----------|----------------|
+| ML engineers at GPU startups | OOM/config failures cost 2+ hours of manual debugging per incident | Automated diagnosis + fix in 604ms, $0.14/cycle |
+| MLOps / platform teams | No automated incident response for GPU workloads | Closed-loop recovery with full evidence trail |
+| AMD Developer Cloud users | No debugging tooling purpose-built for ROCm/MI300X | 10-pattern ROCm-native taxonomy, rocm-smi telemetry |
+| Research labs | Failed experiments break reproducibility | Before/after evidence trail with config diffs |
+
+### Differentiation
+
+| ReplayLab | Alternatives |
+|-----------|-------------|
+| Closed-loop: detect → diagnose → fix → verify | Open-loop: alert only, human fixes |
+| GPU-native taxonomy (10 vLLM/ROCm patterns) | Generic log parsers |
+| Sub-second diagnosis at $0.14/cycle | Manual debugging at $150/incident |
+| Full evidence trail (before/after) | Dashboard metrics without context |
+| Built for AMD ROCm stack | Mostly NVIDIA-focused tooling |
 
 ## Quickstart
 

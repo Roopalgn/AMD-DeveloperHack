@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "replaylab"
+version = "0.1.0"
+description = "GPU experiment flight recorder — autonomous failure diagnosis and recovery for AMD Instinct GPUs"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "Latency Locksmith"},
+]
+keywords = ["amd", "gpu", "rocm", "vllm", "mlops", "debugging", "agents"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "huggingface-hub>=0.20.0",
+    "transformers>=4.38.0",
+    "fastapi>=0.109.0",
+    "uvicorn>=0.27.0",
+    "gradio>=4.0.0",
+    "jinja2>=3.1.0",
+]
+
+[project.optional-dependencies]
+gpu = ["vllm>=0.4.0"]
+dev = ["pytest>=7.0.0"]
+
+[project.urls]
+Homepage = "https://github.com/Roopalgn/AMD-DeveloperHack"
+"HuggingFace Space" = "https://huggingface.co/spaces/lablab-ai-amd-developer-hackathon/ReplayLab"
+"Bug Tracker" = "https://github.com/Roopalgn/AMD-DeveloperHack/issues"
