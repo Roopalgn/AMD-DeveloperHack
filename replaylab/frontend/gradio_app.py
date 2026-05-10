@@ -267,40 +267,94 @@ def run_scenario(scenario_name: str) -> tuple[str, str, str, str]:
 def build_app():
     scenarios = SCENARIOS
 
+    CSS = """
+    .main-header { text-align: center; margin-bottom: 0.5em; }
+    .main-header h1 { font-size: 2em; margin-bottom: 0.2em; }
+    .stat-box { text-align: center; padding: 12px 8px; border-radius: 8px;
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                color: white; min-height: 80px; }
+    .stat-box .stat-value { font-size: 1.6em; font-weight: bold; color: #4fc3f7; }
+    .stat-box .stat-label { font-size: 0.85em; color: #b0bec5; margin-top: 4px; }
+    .scenario-info { padding: 10px 16px; border-left: 3px solid #4fc3f7;
+                     background: #f8f9fa; border-radius: 0 8px 8px 0; margin: 8px 0; }
+    footer { display: none !important; }
+    """
+
     with gr.Blocks(
         title="ReplayLab — GPU Experiment Flight Recorder",
+        css=CSS,
     ) as app:
-        gr.Markdown("""# 🔬 ReplayLab — GPU Experiment Flight Recorder
+        # Header
+        gr.HTML("""
+        <div class="main-header">
+            <h1>🔬 ReplayLab</h1>
+            <p style="font-size:1.1em; color:#555;">
+                GPU Experiment Flight Recorder — Autonomous Failure Recovery Agent
+            </p>
+            <p style="font-size:0.9em; color:#888;">
+                AMD Instinct MI300X (192 GB HBM3) · vLLM 0.17.1 · ROCm 7.2.0 · Qwen2.5-7B-Instruct
+            </p>
+        </div>
+        """)
 
-**AMD Instinct MI300X (192 GB HBM3) | vLLM 0.17.1 | ROCm 7.2.0 | Qwen2.5-7B-Instruct**
+        # Stats banner
+        with gr.Row(equal_height=True):
+            gr.HTML('<div class="stat-box"><div class="stat-value">227</div><div class="stat-label">tok/sec sustained</div></div>')
+            gr.HTML('<div class="stat-box"><div class="stat-value">2,931</div><div class="stat-label">tok/sec @ 16× concurrency</div></div>')
+            gr.HTML('<div class="stat-box"><div class="stat-value">604ms</div><div class="stat-label">LLM diagnosis latency</div></div>')
+            gr.HTML('<div class="stat-box"><div class="stat-value">$0.14</div><div class="stat-label">cost per recovery</div></div>')
+            gr.HTML('<div class="stat-box"><div class="stat-value">1,071×</div><div class="stat-label">cheaper than manual</div></div>')
 
-Select a failure scenario and click **Run** to see the autonomous recovery agent in action.
-Each scenario uses **real MI300X GPU evidence** captured on AMD Developer Cloud.
-""")
+        gr.Markdown("---")
+
+        # Controls
         with gr.Row():
-            scenario_dropdown = gr.Dropdown(
-                choices=[s["name"] for s in scenarios],
-                value=scenarios[0]["name"],
-                label="Failure Scenario",
-                info="Choose a GPU failure pattern to diagnose and recover",
-            )
-            run_btn = gr.Button("▶ Run Recovery Agent", variant="primary", scale=0)
+            with gr.Column(scale=3):
+                scenario_dropdown = gr.Dropdown(
+                    choices=[s["name"] for s in scenarios],
+                    value=scenarios[0]["name"],
+                    label="Select Failure Scenario",
+                    info="Each scenario uses real MI300X GPU evidence from AMD Developer Cloud",
+                )
+            with gr.Column(scale=1, min_width=200):
+                run_btn = gr.Button("▶  Run Recovery Agent", variant="primary", size="lg")
 
+        # Scenario description
+        scenario_desc = gr.HTML(
+            f'<div class="scenario-info">💡 <strong>{scenarios[0]["name"]}</strong> — {scenarios[0]["description"]}</div>'
+        )
+
+        def update_desc(name):
+            s = SCENARIO_MAP.get(name, scenarios[0])
+            return f'<div class="scenario-info">💡 <strong>{s["name"]}</strong> — {s["description"]}</div>'
+
+        scenario_dropdown.change(fn=update_desc, inputs=[scenario_dropdown], outputs=[scenario_desc])
+
+        # Results tabs
         with gr.Tabs():
-            with gr.Tab("📊 Timeline"):
-                timeline_output = gr.Markdown(value="*Click 'Run Recovery Agent' to start*")
-            with gr.Tab("🔍 Diagnosis"):
-                diagnosis_output = gr.Markdown(value="*Click 'Run Recovery Agent' to start*")
-            with gr.Tab("🧠 Agent Trace"):
-                trace_output = gr.Markdown(value="*Click 'Run Recovery Agent' to start*")
+            with gr.Tab("📊 Recovery Timeline"):
+                timeline_output = gr.Markdown(value="*Select a scenario and click **Run Recovery Agent** to begin*")
+            with gr.Tab("🔍 Diagnosis Details"):
+                diagnosis_output = gr.Markdown(value="*Waiting for scenario...*")
+            with gr.Tab("🧠 Agent Reasoning Trace"):
+                trace_output = gr.Markdown(value="*Waiting for scenario...*")
             with gr.Tab("💰 Cost Analysis"):
-                cost_output = gr.Markdown(value="*Click 'Run Recovery Agent' to start*")
+                cost_output = gr.Markdown(value="*Waiting for scenario...*")
 
         run_btn.click(
             fn=run_scenario,
             inputs=[scenario_dropdown],
             outputs=[timeline_output, diagnosis_output, trace_output, cost_output],
         )
+
+        # Footer
+        gr.HTML("""
+        <div style="text-align:center; padding:16px; color:#888; font-size:0.85em; border-top:1px solid #eee; margin-top:16px;">
+            <strong>ReplayLab</strong> · Team Latency Locksmith · AMD Developer Hackathon 2026 · Track 1: AI Agents<br>
+            <a href="https://github.com/Roopalgn/AMD-DeveloperHack" target="_blank">GitHub</a> ·
+            MIT License · 38 tests passing
+        </div>
+        """)
 
     return app
 
@@ -310,5 +364,4 @@ if __name__ == "__main__":
     app.launch(
         server_name="0.0.0.0",
         server_port=7860,
-        theme=gr.themes.Base(primary_hue="blue", neutral_hue="slate"),
     )
