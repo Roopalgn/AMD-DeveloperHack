@@ -269,7 +269,6 @@ def build_app():
 
     with gr.Blocks(
         title="ReplayLab — GPU Experiment Flight Recorder",
-        theme=gr.themes.Base(primary_hue="blue", neutral_hue="slate"),
     ) as app:
         gr.Markdown("""# 🔬 ReplayLab — GPU Experiment Flight Recorder
 
@@ -308,4 +307,8 @@ Each scenario uses **real MI300X GPU evidence** captured on AMD Developer Cloud.
 
 if __name__ == "__main__":
     app = build_app()
-    app.launch(server_name="0.0.0.0", server_port=7860)
+    app.launch(
+        server_name="0.0.0.0",
+        server_port=7860,
+        theme=gr.themes.Base(primary_hue="blue", neutral_hue="slate"),
+    )
