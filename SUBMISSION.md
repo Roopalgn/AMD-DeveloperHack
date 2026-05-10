@@ -8,7 +8,7 @@ ReplayLab is a GPU experiment flight recorder with an autonomous recovery agent 
 
 ReplayLab helps ML engineers recover from failed GPU experiments without losing reproducibility.
 
-In the demo, a GPU experiment fails because `gpu_memory_utilization=0.08` starves vLLM of VRAM on an AMD Instinct MI300X — the model loads at 14.35 GiB but leaves -1.84 GiB for KV cache, crashing with `ValueError: No available memory`. ReplayLab records the command, logs, exit code, metrics, and GPU telemetry; identifies the constrained memory setting as the cause; generates a fixed config using `gpu_memory_utilization=0.9`; reruns the experiment; and verifies success at 230.17 tokens/sec (8/8 prompts completed) — all validated on real AMD hardware.
+In the demo, a GPU experiment fails because `max_model_len=65536` — double the model's 32K context limit — causes vLLM to crash on startup on an AMD Instinct MI300X. ReplayLab records the command, logs, exit code, metrics, and GPU telemetry via rocm-smi; classifies the failure against a 10-pattern vLLM/ROCm taxonomy (`context_length_exceeded`); runs LLM-powered diagnosis using Qwen2.5-7B in 604ms; generates a fix (`max_model_len=32768`, `gpu_memory_utilization=0.9`); reruns the experiment; and verifies success at 227 tokens/sec (4/4 prompts completed) — all validated on real AMD hardware.
 
 The project is designed for AMD GPU workflows where runtime behavior matters: memory pressure, throughput, batch sizing, and failed model execution. Instead of being another log viewer or monitoring dashboard, ReplayLab connects failure to recovery and produces a replayable evidence trail that engineers can trust.
 
@@ -57,12 +57,13 @@ The project is designed for AMD GPU workflows where runtime behavior matters: me
 | torch.compile (warm) | 5.95s |
 | KV cache allocation | 155.31 GiB / 2,908,128 tokens |
 | Max concurrency (32K ctx) | 88 sequences |
-| Inference throughput | 230.17 tok/sec |
-| Time to first token | ~180ms |
+| Inference throughput | 227 tok/sec |
+| Time to first token | 283ms |
 | Full recovery cycle | ~4 min, $0.14 |
 | Tests | 38 passing |
 
 ## Links
 
 - **GitHub**: https://github.com/Roopalgn/AMD-DeveloperHack
+- **HF Space**: https://huggingface.co/spaces/lablab-ai-amd-developer-hackathon/ReplayLab
 - **Hackathon**: [lablab.ai AMD Developer Hackathon 2026](https://lablab.ai/event/amd-developer-hackathon-2026)

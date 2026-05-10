@@ -1,12 +1,12 @@
-# Internal Design Documents
+# Documentation
 
-These files contain strategy, architecture, and planning notes used during development. They are not part of the demo or submission — they document the reasoning behind ReplayLab.
+Screenshots from AMD Developer Cloud and MI300X GPU sessions used as evidence in the ReplayLab demo.
 
 | File | Contents |
 |------|----------|
-| `hackathon-strategy-knowledge.md` | Judging analysis, idea evaluation, project selection |
-| `replaylab-agent-architecture.md` | Multi-agent design and interaction flow |
-| `replaylab-mvp-architecture.md` | MVP component design and data model |
-| `replaylab-mvp-task-plan.md` | Build task breakdown and execution order |
-| `replaylab-first-task-prompt.md` | First implementation task specification |
-| `project-cost-risk.md` | Cost analysis and billing risk mitigation |
+| `screenshots/rocm_smi_active.png` | rocm-smi output during benchmark |
+| `screenshots/vllm_startup.png` | vLLM server startup on MI300X |
+| `screenshots/vllm_oom_crash.png` | vLLM OOM crash output |
+| `screenshots/full_demo_llm.png` | Full demo with LLM diagnosis |
+| `screenshots/amd_cloud_vm.png` | AMD Developer Cloud VM |
+| `screenshots/amd_credits.png` | AMD Developer Cloud credits |
